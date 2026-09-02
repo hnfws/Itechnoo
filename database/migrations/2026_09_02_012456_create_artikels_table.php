@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('artikels', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
+
             $table->string('title');
             $table->longText('content');
             $table->string('image')->nullable();
