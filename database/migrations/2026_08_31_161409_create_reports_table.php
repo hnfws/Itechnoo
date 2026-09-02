@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reporter_key')->nullable()->index();
+            $table->String('reporter_key')->nullable()->index();
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
             
             $table->string('title');
