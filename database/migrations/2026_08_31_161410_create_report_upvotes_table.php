@@ -8,12 +8,15 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('report_upvotes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('report_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // FK mengarah ke reports.id
+            $table->foreignId('report_id')->constrained('reports')->onDelete('cascade');
+            
+            $table->string('voter_key'); // Menyimpan IP Address / Session ID warga tanpa login
             $table->timestamps();
 
-            // Cegah upvote ganda dari user yang sama
-            $table->unique(['report_id', 'user_id']);
+            // Mencegah 1 voter_key melakukan vote berkali-kali pada 1 laporan
+            $table->unique(['report_id', 'voter_key']);
         });
     }
 

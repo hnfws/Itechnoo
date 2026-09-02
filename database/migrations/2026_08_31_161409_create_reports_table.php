@@ -8,25 +8,28 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('reporter_key')->nullable()->index();
+            $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
+            
             $table->string('title');
             $table->text('description');
-            $table->string('image_path');
-            $table->string('location_name');
+            $table->string('image');
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('location');
             
-            // Output Analisis Gemini AI
-            $table->text('ai_summary')->nullable();
-            $table->text('ai_safety_advice')->nullable();
-            $table->text('ai_gov_action')->nullable();
-            $table->integer('ai_severity_score')->default(1); // Skala 1 - 100
-            
-            // Prioritas & Metrik Publik
-            $table->unsignedInteger('upvote_count')->default(0);
+            // Kolom Hasil AI & Metrik Laporan
+            $table->string('severity')->nullable();
+            $table->string('urgency')->nullable();
             $table->decimal('priority_score', 8, 2)->default(0);
-            $table->enum('status', ['unverified', 'verified', 'in_progress', 'resolved'])->default('unverified');
+            $table->text('potential_risk')->nullable();
+            $table->text('ai_masyarakat')->nullable();
+            $table->text('ai_adm')->nullable();
+
             
+            // Status Laporan
+            $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending');
+
             $table->timestamps();
         });
     }

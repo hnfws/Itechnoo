@@ -1,4 +1,10 @@
-<!-- <<<<<<< HEAD
+{{-- 
+======================================================================
+📌 [VERSI BACKEND / AI INTEGRATION] (DI-KOMEN SEMENTARA)
+Kode di bawah ini menggunakan data $reports asli dari controller.
+Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
+======================================================================
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -65,10 +71,18 @@
     </div>
 </body>
 </html>
-======= -->
+--}}
+
+{{-- 
+======================================================================
+🎨 [VERSI DESAIN TEMAN] (AKTIF DITAMPILKAN)
+Tampilan UI statistik modern buatan teman kelompok.
+======================================================================
+--}}
+
 @php
-    // Data contoh sementara. Nanti backend mengirim angka asli dengan nama variabel yang sama.
-    $adminName ??= 'Endministrator';
+    // Data dummy agar UI bisa tampil tanpa error $reports
+    $adminName ??= 'Administrator';
     $stats ??= [
         'total' => 248,
         'high' => 18,
@@ -115,4 +129,3 @@
         <x-admin.stat label="Laporan Selesai" :value="$stats['done']" class="min-h-32" />
     </div>
 </x-layouts.admin>
->>>>>>> 0642a3f41e1b8df3251dfa95f19f46a16e4a6442
