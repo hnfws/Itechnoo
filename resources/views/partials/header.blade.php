@@ -1,8 +1,7 @@
 @php
     $navItems = [
         ['label' => 'Beranda', 'url' => '/'],
-        ['label' => 'Peta Laporan', 'url' => '/laporan'],
-        ['label' => 'Buat Laporan', 'url' => '/laporan/buat'],
+        ['label' => 'Laporan', 'url' => '/laporan'],
         ['label' => 'Artikel', 'url' => '/artikel'],
     ];
 @endphp
@@ -33,10 +32,6 @@
                         </a>
                     </li>
                 @endforeach
-
-                <li>
-                    <x-button href="#" size="sm" class="rounded-full">Masuk</x-button>
-                </li>
             </ul>
         </nav>
 
@@ -64,8 +59,6 @@
                     {{ $item['label'] }}
                 </a>
             @endforeach
-
-            <x-button href="#" size="sm" class="mt-2 w-full">Masuk</x-button>
         </x-container>
     </div>
 </header>

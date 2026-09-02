@@ -4,7 +4,7 @@
     $navItems = [
         ['label' => 'Dashboard', 'route' => 'admin.dashboard'],
         ['label' => 'Laporan', 'route' => 'admin.reports'],
-        ['label' => 'Artikel', 'route' => null],
+        ['label' => 'Artikel', 'route' => 'admin.articles'],
     ];
 @endphp
 
