@@ -3,22 +3,6 @@
     // Nanti backend tinggal mengirim data dengan nama variabel yang sama.
     $announcement ??= 'Saat ini sedang dilakukan perbaikan jalan di Jl Letjen Soeprapto. Mohon maaf apabila perbaikan saat ini mengganggu perjalanan anda. Harap gunakan jalur alternatif.';
 
-    $reports ??= [
-        [
-            'id' => 1,
-            'title' => 'Jalan rusak',
-            'location' => 'Jl Letjen Soeprapto',
-            'description' => 'Jalan rusak bolong bolong sudah ada korban 2 pemotor terjatuh. Tolong segera dibenerkan agar tidak ada korban lagi',
-            'upvotes' => 128,
-        ],
-        [
-            'id' => 2,
-            'title' => 'Halte Pinggir Jalan',
-            'location' => 'Jl Letjen Soeprapto',
-            'description' => 'Halte kuning yang sudah mulai tua, membutuhkan perbaikan segera. Saat duduk di halte karat nya nempel di baju dan celana.',
-            'upvotes' => 42,
-        ],
-    ];
 
     $articles ??= [
         ['title' => 'Cara melaporkan kerusakan fasilitas umum', 'date' => '12 Agustus 2026', 'excerpt' => 'Panduan singkat mengirim laporan agar cepat ditindaklanjuti petugas.'],

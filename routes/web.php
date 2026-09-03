@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 // ==========================================
 
 // Landing Page & Halaman Artikel
-Route::view('/', 'home')->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::view('/artikel', 'articles')->name('articles.index');
 
 // Feed Laporan
