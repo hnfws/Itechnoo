@@ -11,6 +11,15 @@ class Report extends Model
 {
     use HasFactory;
 
+    // Nilai status yang valid beserta labelnya
+    const STATUSES = [
+        'belum diverifikasi'     => 'Pending',
+        'terverifikasi'    => 'Terverifikasi',
+        'terverifikasi_in_progress' => 'Dalam Perbaikan',
+        'resolved'    => 'Selesai',
+        'rejected'    => 'Ditolak',
+    ];
+
     protected $fillable = [
         'reporter_key',
         'reporter',
@@ -39,6 +48,26 @@ class Report extends Model
     public function upvotes(): HasMany
     {
         return $this->hasMany(ReportUpvote::class);
+    }
+
+    // Label status dalam Bahasa Indonesia
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUSES[$this->status] ?? $this->status;
+    }
+
+    // Warna teks per status (dipakai di Blade)
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status) {
+    'belum diverifikasi'        => 'text-amber-500',
+    'terverifikasi'             => 'text-green-600',
+    'terverifikasi_in_progress' => 'text-brand-600',
+    'resolved'                  => 'text-green-700',
+    'rejected'                  => 'text-danger',
+    default                     => 'text-ink-muted',
+};
+
     }
 
     /**

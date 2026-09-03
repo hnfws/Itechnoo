@@ -32,7 +32,7 @@
             <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
                     <span class="font-semibold text-ink">Laporan #{{ str_pad($report->id, 7, '0', STR_PAD_LEFT) }}</span>                <span class="text-sm text-ink-muted">
                     Status :
-                    <span class="font-medium text-green-600">{{ $report->status }}</span>
+                    <span class="font-medium {{ $report->status_color }}">{{ $report->status_label }}</span>
                 </span>
             </div>
 
