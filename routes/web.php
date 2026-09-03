@@ -42,19 +42,26 @@ Route::post('/laporan/{id}/upvote', [ReportController::class, 'toggleUpvote'])->
 // ==========================================
 
 // Login Form & Process
-Route::get('/admin/login', [ReportController::class, 'showAdminLoginForm'])->name('admin.login');
-Route::post('/admin/login', [ReportController::class, 'adminLogin'])->name('admin.login.attempt');
 
 // Dashboard & Fitur Admin (Dilindungi Auth)
-Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/', [ReportController::class, 'adminDashboard'])->name('admin.welcome');
-    Route::get('/dashboard', [ReportController::class, 'adminDashboard'])->name('admin.dashboard');
+Route::prefix('admin')->group(function () {
+    // Halaman Login
+    Route::view('/login', 'admin.login')->name('admin.login')->name('login');
+
+    // Halaman Utama Admin (Welcome)
+    Route::view('/', 'admin.welcome')->name('admin.welcome');
+
+    // Dashboard Admin
+    // Memanggil method adminDashboard dari ReportController
     Route::get('/laporan', [ReportController::class, 'adminDashboard'])->name('admin.reports');
-    
+    Route::get('/dashboard', [ReportController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::get('/laporan/{id}', function (string $id) {
         return view('admin.report-detail', ['reportId' => $id]);
     })->whereNumber('id')->name('admin.reports.show');
 
-    Route::patch('/laporan/{id}/status', [ReportController::class, 'updateStatus'])->name('admin.reports.status');
-    Route::post('/logout', [ReportController::class, 'adminLogout'])->name('admin.logout');
+  Route::view('/artikel', 'admin.articles')->name('admin.articles');
+    Route::view('/artikel/buat', 'admin.article-create')->name('admin.articles.create');
+    Route::any('/logout', function () {
+        return redirect()->route('admin.login');
+    })->name('admin.logout');
 });

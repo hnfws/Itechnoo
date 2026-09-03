@@ -1,21 +1,3 @@
-@php
-    // Data contoh sementara. Nanti backend mengirim angka & daftar laporan dengan nama variabel yang sama.
-    $stats ??= [
-        'total' => 248,
-        'verified' => 92,
-        'in_progress' => 41,
-        'done' => 115,
-    ];
-
-    $reports ??= [
-        ['id' => 1, 'title' => 'Jalan rusak', 'reporter' => 'Adi Cahyadi', 'location' => 'Jl. Letjen Soeprapto', 'priority' => 'rendah',   'status' => 'Terverifikasi'],
-        ['id' => 2, 'title' => 'Jalan rusak', 'reporter' => 'Adi Cahyadi', 'location' => 'Jl. Letjen Soeprapto', 'priority' => 'menengah', 'status' => 'Terverifikasi'],
-        ['id' => 3, 'title' => 'Jalan rusak', 'reporter' => 'Adi Cahyadi', 'location' => 'Jl. Letjen Soeprapto', 'priority' => 'rendah',   'status' => 'Terverifikasi'],
-        ['id' => 4, 'title' => 'Jalan rusak', 'reporter' => 'Adi Cahyadi', 'location' => 'Jl. Letjen Soeprapto', 'priority' => 'tinggi',   'status' => 'Terverifikasi'],
-        ['id' => 5, 'title' => 'Jalan rusak', 'reporter' => 'Adi Cahyadi', 'location' => 'Jl. Letjen Soeprapto', 'priority' => 'rendah',   'status' => 'Terverifikasi'],
-    ];
-@endphp
-
 <x-layouts.admin title="Laporan">
     {{-- Ringkasan atas --}}
     <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
@@ -55,6 +37,7 @@
                     <tr class="border-y border-line bg-surface-muted text-ink-muted">
                         <th scope="col" class="px-5 py-3 font-medium">Judul Laporan</th>
                         <th scope="col" class="px-5 py-3 font-medium">Nama Pelapor</th>
+                        <th scope="col" class="px-5 py-3 font-medium">Deskripsi</th>
                         <th scope="col" class="px-5 py-3 font-medium">Lokasi</th>
                         <th scope="col" class="px-5 py-3 font-medium">Skala Prioritas</th>
                         <th scope="col" class="px-5 py-3 font-medium">Status</th>
@@ -66,7 +49,17 @@
                         <tr class="border-b border-line transition hover:bg-surface-muted">
                             <td class="px-5 py-4 font-medium text-ink">{{ $report['title'] }}</td>
                             <td class="px-5 py-4 text-ink">{{ $report['reporter'] }}</td>
-                            <td class="px-5 py-4 text-ink">{{ $report['location'] }}</td>
+                            <td class="px-5 py-4 text-ink">{{ $report['description'] }}</td>
+                            <td class="px-5 py-4 text-ink">
+                                @if ($report['maps_url'])
+                                    <a href="{{ $report['maps_url'] }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-medium text-brand-600 underline hover:text-brand-700">
+                                        {{ $report['location'] }}
+                                        
+                                    </a>
+                                @else
+                                    {{ $report['location'] }}
+                                @endif
+                            </td>
                             <td class="px-5 py-4"><x-admin.priority :level="$report['priority']" /></td>
                             <td class="px-5 py-4 font-medium text-green-600">{{ $report['status'] }}</td>
                             <td class="px-5 py-4">

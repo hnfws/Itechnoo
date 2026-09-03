@@ -57,6 +57,7 @@
                     <div><span class="text-ink-muted">Judul Laporan :</span> <span class="font-medium text-ink">{{ $report['title'] }}</span></div>
                     <div><span class="text-ink-muted">Nama Pelapor :</span> <span class="font-medium text-ink">{{ $report['reporter'] }}</span></div>
                     <div><span class="text-ink-muted">Lokasi :</span> <span class="font-medium text-ink">{{ $report['location'] }}</span></div>
+                    <div><span class="text-ink-muted">Deskripsi :</span> <span class="font-medium text-ink">{{ $report['description'] }}</span></div>
                 </dl>
 
                 <div class="shrink-0 text-center">
