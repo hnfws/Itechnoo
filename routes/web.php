@@ -3,6 +3,8 @@
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ArtikelController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -59,9 +61,12 @@ Route::prefix('admin')->group(function () {
         return view('admin.report-detail', ['reportId' => $id]);
     })->whereNumber('id')->name('admin.reports.show');
 
-  Route::view('/artikel', 'admin.articles')->name('admin.articles');
-    Route::view('/artikel/buat', 'admin.article-create')->name('admin.articles.create');
-    Route::any('/logout', function () {
+ Route::get('/artikel', [ArtikelController::class, 'index'])->name('admin.articles');
+    Route::get('/artikel/buat', [ArtikelController::class, 'create'])->name('admin.articles.create');
+
+    // TAMBAHKAN ROUTE STORE INI
+    Route::post('/artikel/simpan', [ArtikelController::class, 'store'])->name('admin.articles.store');
+        Route::any('/logout', function () {
         return redirect()->route('admin.login');
     })->name('admin.logout');
 });
