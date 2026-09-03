@@ -30,6 +30,18 @@
                     <span class="text-ink-muted">Skala Prioritas :</span>
                     <x-admin.priority :level="$report->priority_score ?? 'rendah'" />
                 </span>
+            </div>
+
+        {{-- Kolom kanan: detail --}}
+        <x-card>
+            <div class="flex items-start justify-between gap-4">
+                <dl class="space-y-1 text-sm">
+                    <div><span class="text-ink-muted">Judul Laporan :</span> <span class="font-medium text-ink">{{ $report->title }}</span></div>
+                    <div><span class="text-ink-muted">Nama Pelapor :</span> <span class="font-medium text-ink">{{ $report->reporter }}</span></div>
+                    <div><span class="text-ink-muted">Lokasi :</span> <span class="font-medium text-ink">{{ $report->location }}</span></div>
+                    <div><span class="text-ink-muted">Deskripsi :</span> <span class="font-medium text-ink">{{ $report->description }}</span></div>
+                </dl>
+
 
                 <div class="inline-flex items-center gap-2 rounded-full border border-line bg-surface-muted px-4 py-1.5 text-sm">
                     <span class="text-ink-muted">Status :</span>
