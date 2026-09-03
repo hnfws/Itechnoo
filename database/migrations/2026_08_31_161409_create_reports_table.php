@@ -10,7 +10,10 @@ return new class extends Migration {
             $table->id();
             $table->String('reporter_key')->nullable()->index();
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
-            
+            $table->string('reporter');
+            $table->string('phone');
+
+
             $table->string('title');
             $table->text('description');
             $table->string('image');
@@ -28,7 +31,7 @@ return new class extends Migration {
 
             
             // Status Laporan
-            $table->enum('status', ['pending', 'in_progress', 'resolved', 'rejected'])->default('pending');
+            $table->enum('status', ['belum diverifikasi', 'terverifikasi', 'terverifikasi_in_progress', 'resolved', 'rejected'])->default('belum diverifikasi');
 
             $table->timestamps();
         });

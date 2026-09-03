@@ -13,6 +13,14 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+'groq' => [
+    'key' => env('GROQ_API_KEY'),
+    'model' => env('GROQ_MODEL', 'llama-3.2-11b-vision-instruct'),
+],
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+    ],
 
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),

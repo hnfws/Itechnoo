@@ -12,15 +12,28 @@ class Report extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'title', 'description', 'image_path',
-        'location_name', 'latitude', 'longitude',
-        'ai_summary', 'ai_safety_advice', 'ai_gov_action',
-        'ai_severity_score', 'upvote_count', 'priority_score', 'status'
+        'reporter_key',
+        'reporter',
+        'phone',
+        'admin_id',
+        'title',
+        'description',
+        'image',
+        'latitude',
+        'longitude',
+        'location',
+        'severity',
+        'urgency',
+        'priority_score',
+        'potential_risk',
+        'ai_masyarakat',
+        'ai_adm',
+        'status',
     ];
 
-    public function user(): BelongsTo
+    public function admin(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Admin::class);
     }
 
     public function upvotes(): HasMany
@@ -29,15 +42,22 @@ class Report extends Model
     }
 
     /**
-     * Hitung ulang skor prioritas gabungan:
-     * (AI Severity * 60%) + (Upvote Weight * 40%)
+     * Hitung ulang skor prioritas:
+     * (Bobot Severity AI * 60%) + (Upvote Score * 40%)
      */
     public function recalculatePriorityScore(): void
     {
-        $severityWeight = $this->ai_severity_score * 0.60;
+        $severityScore = match (strtolower($this->severity ?? 'rendah')) {
+            'critical', 'tinggi', 'high' => 100,
+            'medium', 'sedang'           => 60,
+            default                      => 30,
+        };
+
+        $severityWeight = $severityScore * 0.60;
         
-        // Pembobotan upvote logaritmik/cap (Maks 100 poin)
-        $upvoteScore = min($this->upvote_count * 5, 100); 
+        // Hitung total vote langsung dari relasi report_upvotes
+        $upvoteCount = $this->upvotes()->count();
+        $upvoteScore = min($upvoteCount * 5, 100); // Max 100 poin
         $upvoteWeight = $upvoteScore * 0.40;
 
         $this->priority_score = round($severityWeight + $upvoteWeight, 2);

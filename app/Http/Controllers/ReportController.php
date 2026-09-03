@@ -6,126 +6,139 @@ use App\Models\Report;
 use App\Models\ReportUpvote;
 use App\Services\GeminiService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
-    // 1. Tampilkan Feed Publik Laporan Warga
+    /**
+     * Mengambil/membuat unique key pelapor berbasis cookie browser.
+     */
+    private function getReporterKey(): string
+    {
+        $key = Cookie::get('guest_reporter_key');
+        if (!$key) {
+            $key = (string) Str::uuid();
+            Cookie::queue('guest_reporter_key', $key, 525600); // Cookie 1 tahun
+        }
+        return $key;
+    }
+
     public function index()
     {
-        $reports = Report::with(['user', 'upvotes'])
-            ->orderBy('priority_score', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('reports.feed', compact('reports'));
+        $reports = Report::latest()->paginate(10);
+        return view('reports', compact('reports'));
     }
 
-    // 2. Tampilkan Form Buat Laporan
     public function create()
     {
-        return view('reports.create');
+        // Memanggil file resources/views/report-create.blade.php
+        return view('report-create');
     }
 
-    // 3. Simpan Laporan Baru + Trigger Gemini AI
-    public function store(Request $request, GeminiService $geminiService)
+    public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'reporter'    => 'required|string|max:255',
+            'phone'       => 'required|string|max:20',
             'description' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-            'location_name' => 'required|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'image'       => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            'location'    => 'required|string|max:255',
+            'latitude'    => 'nullable|numeric|between:-90,90',
+            'longitude'   => 'nullable|numeric|between:-180,180',
+            'agreement'   => 'accepted',
         ]);
 
+        $reporterKey = $this->getReporterKey();
         $imagePath = $request->file('image')->store('reports', 'public');
+        $report = Report::create([
+            'reporter_key'   => $reporterKey,
+            'title'          => $validated['title'],
+            'reporter'       => $validated['reporter'],
+            'phone'          => $validated['phone'],
+            'description'    => $validated['description'],
+            'image'          => $imagePath,
+            'location'       => $validated['location'],
+            'latitude'       => $validated['latitude'] ?? null,
+            'longitude'      => $validated['longitude'] ?? null,
+        ]);
 
-        // Panggil Gemini AI Service
-        $aiResult = $geminiService->analyzeInfrastructureDamage($imagePath, $request->description);
-
-        if ($aiResult && isset($aiResult['is_infrastructure']) && !$aiResult['is_infrastructure']) {
-            return redirect()->back()->withInput()->withErrors([
-                'image' => 'Sistem mendeteksi foto bukan merupakan kerusakan infrastruktur publik.'
+        $aiAnalysis = GeminiService::analyzeReport($imagePath, $validated['description']);
+        if ($aiAnalysis !== null) {
+            $report->update([
+                'severity'       => $aiAnalysis['severity'] ?? 'Sedang',
+                'urgency'        => $aiAnalysis['urgency'] ?? 'Normal',
+                'potential_risk' => $aiAnalysis['potential_risk'] ?? null,
+                'ai_masyarakat'  => $aiAnalysis['ai_masyarakat'] ?? null,
+                'ai_adm'         => $aiAnalysis['ai_adm'] ?? null,
             ]);
         }
 
-        $report = Report::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'description' => $request->description,
-            'image_path' => $imagePath,
-            'location_name' => $request->location_name,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'ai_summary' => $aiResult['ai_summary'] ?? 'Laporan diterima dan sedang diverifikasi.',
-            'ai_safety_advice' => $aiResult['ai_safety_advice'] ?? 'Tetap waspada di sekitar area.',
-            'ai_gov_action' => $aiResult['ai_gov_action'] ?? 'Lakukan evaluasi lapangan.',
-            'ai_severity_score' => $aiResult['ai_severity_score'] ?? 50,
+        $report->recalculatePriorityScore();
+
+        return redirect()->route('reports.show', ['id' => $report->id])
+            ->with('success', 'Laporan berhasil terkirim!');
+    }
+
+    /**
+     * Menampilkan Halaman Detail Laporan
+     */
+    public function show($id)
+    {
+        $report = Report::findOrFail($id);
+        // Memanggil file resources/views/report-detail.blade.php
+        return view('report-detail', compact('report'));
+    }
+
+    public function reanalyze($id)
+    {
+        $report = Report::findOrFail($id);
+        $analysis = GeminiService::analyzeReport($report->image, $report->description);
+
+        if ($analysis === null) {
+            return back()->with('error', 'Gemini belum merespons. Coba lagi setelah beberapa saat.');
+        }
+
+        $report->update([
+            'severity'       => $analysis['severity'] ?? 'Sedang',
+            'urgency'        => $analysis['urgency'] ?? 'Normal',
+            'potential_risk' => $analysis['potential_risk'] ?? null,
+            'ai_masyarakat'  => $analysis['ai_masyarakat'] ?? null,
+            'ai_adm'         => $analysis['ai_adm'] ?? null,
         ]);
+        $report->recalculatePriorityScore();
+
+        return back()->with('success', 'Analisis AI berhasil diperbarui.');
+    }
+
+    /**
+     * Logika Upvote Dukungan Warga
+     */
+    public function toggleUpvote($id)
+    {
+        $report = Report::findOrFail($id);
+        $userKey = $this->getReporterKey();
+
+        if ($report->reporter_key === $userKey) {
+            return back()->with('error', 'Kamu tidak dapat memberikan upvote pada laporan milik sendiri.');
+        }
+
+        $existingVote = ReportUpvote::where('report_id', $report->id)
+            ->where('voter_key', $userKey)
+            ->first();
+
+        if ($existingVote) {
+            $existingVote->delete();
+        } else {
+            ReportUpvote::create([
+                'report_id' => $report->id,
+                'voter_key' => $userKey,
+            ]);
+        }
 
         $report->recalculatePriorityScore();
 
-        return redirect()->route('reports.index')->with('success', 'Laporan berhasil dibuat dan ditinjau AI!');
-    }
-
-    // 4. Toggle Upvote Real-Time (AJAX API)
-    public function toggleUpvote(Request $request, $id)
-    {
-        if (!Auth::check()) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        $userId = Auth::id();
-        $report = Report::findOrFail($id);
-
-        DB::transaction(function () use ($report, $userId) {
-            $existingUpvote = ReportUpvote::where('report_id', $report->id)
-                ->where('user_id', $userId)
-                ->first();
-
-            if ($existingUpvote) {
-                $existingUpvote->delete();
-                $report->decrement('upvote_count');
-            } else {
-                ReportUpvote::create([
-                    'report_id' => $report->id,
-                    'user_id' => $userId
-                ]);
-                $report->increment('upvote_count');
-            }
-
-            $report->recalculatePriorityScore();
-        });
-
-        return response()->json([
-            'upvote_count' => $report->fresh()->upvote_count,
-            'priority_score' => $report->fresh()->priority_score,
-        ]);
-    }
-
-    // 5. Dashboard Admin
-    public function adminDashboard()
-    {
-        $reports = Report::with('user')
-            ->orderBy('priority_score', 'desc')
-            ->paginate(15);
-
-        return view('admin.dashboard', compact('reports'));
-    }
-
-    // 6. Update Status oleh Admin
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:unverified,verified,in_progress,resolved'
-        ]);
-
-        $report = Report::findOrFail($id);
-        $report->status = $request->status;
-        $report->save();
-
-        return redirect()->back()->with('success', 'Status laporan berhasil diperbarui.');
+        return back()->with('success', 'Status dukungan berhasil diperbarui.');
     }
 }
