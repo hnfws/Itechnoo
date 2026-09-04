@@ -9,5 +9,5 @@ class ReportUpvote extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['report_id', 'user_id'];
+    protected $fillable = ['report_id', 'voter_key'];
 }

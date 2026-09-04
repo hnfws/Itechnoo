@@ -26,7 +26,7 @@ class ReportController extends Controller
 
     public function index()
     {
-        $reports = Report::latest()->paginate(10);
+        $reports = Report::withCount('upvotes')->latest()->paginate(10);
         return view('reports', compact('reports'));
     }
 
@@ -115,12 +115,18 @@ class ReportController extends Controller
     /**
      * Logika Upvote Dukungan Warga
      */
-    public function toggleUpvote($id)
+    public function toggleUpvote(Request $request, $id)
     {
         $report = Report::findOrFail($id);
         $userKey = $this->getReporterKey();
 
         if ($report->reporter_key === $userKey) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Kamu tidak dapat memberikan upvote pada laporan milik sendiri.',
+                ], 422);
+            }
+
             return back()->with('error', 'Kamu tidak dapat memberikan upvote pada laporan milik sendiri.');
         }
 
@@ -128,18 +134,26 @@ class ReportController extends Controller
             ->where('voter_key', $userKey)
             ->first();
 
-        if ($existingVote) {
-            $existingVote->delete();
-        } else {
+        if (!$existingVote) {
             ReportUpvote::create([
                 'report_id' => $report->id,
                 'voter_key' => $userKey,
             ]);
+
+            $report->recalculatePriorityScore();
         }
 
-        $report->recalculatePriorityScore();
+        if ($request->expectsJson()) {
+            return response()->json([
+                'upvote_count' => $report->upvotes()->count(),
+                'has_upvoted' => true,
+                'priority_score' => $report->priority_score,
+            ]);
+        }
 
-        return back()->with('success', 'Status dukungan berhasil diperbarui.');
+        return back()->with('success', $existingVote
+            ? 'Kamu sudah mendukung laporan ini.'
+            : 'Dukungan berhasil ditambahkan.');
     }
 
     public function adminDashboard()
