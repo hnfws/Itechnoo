@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Artikel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ArtikelController extends Controller
 {
@@ -13,6 +14,13 @@ class ArtikelController extends Controller
             ->paginate(9);
 
         return view('articles', compact('articles')); // Memanggil view artikel publik
+    }
+
+    public function show(Artikel $artikel)
+    {
+        abort_unless($artikel->status === 'published', 404);
+
+        return view('article-detail', compact('artikel'));
     }
     // TAMBAHKAN METHOD INDEX INI
     public function index()
@@ -27,6 +35,11 @@ class ArtikelController extends Controller
         return view('admin.article-create');
     }
 
+    public function edit(Artikel $artikel)
+    {
+        return view('admin.article-create', ['article' => $artikel]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -34,6 +47,8 @@ class ArtikelController extends Controller
             'content' => 'required|string',
             'image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
+
+        $validated['content'] = $this->sanitizeContent($validated['content']);
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -45,9 +60,46 @@ class ArtikelController extends Controller
             'title'    => $validated['title'],
             'content'  => $validated['content'],
             'image'    => $imagePath,
-            'status'   => 'draft', // Default status
+            'status'   => 'published',
         ]);
 
         return redirect()->route('admin.articles')->with('success', 'Artikel berhasil disimpan!');
+    }
+
+    public function update(Request $request, Artikel $artikel)
+    {
+        $validated = $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'required|string',
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'content' => $this->sanitizeContent($validated['content']),
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($artikel->image) {
+                Storage::disk('public')->delete($artikel->image);
+            }
+
+            $data['image'] = $request->file('image')->store('articles', 'public');
+        }
+
+        $artikel->update($data);
+
+        return redirect()->route('admin.articles')->with('success', 'Artikel berhasil diperbarui!');
+    }
+
+    private function sanitizeContent(string $content): string
+    {
+        $content = strip_tags(
+            $content,
+            '<p><br><strong><b><em><i><u><s><ol><ul><li><h2><h3><blockquote><font><div><span><a>'
+        );
+        $content = preg_replace('/\s+on\w+\s*=\s*(".*?"|\'.*?\'|[^\s>]+)/i', '', $content);
+
+        return preg_replace('/(href|src)\s*=\s*([\'\"])\s*javascript:[^\'\"]*\2/i', '$1="#"', $content);
     }
 }

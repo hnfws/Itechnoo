@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 // Landing Page & Halaman Artikel
 Route::get('/', HomeController::class)->name('home');
 Route::get('/artikel', [ArtikelController::class, 'publicIndex'])->name('articles.index');
+Route::get('/artikel/{artikel}', [ArtikelController::class, 'show'])->name('articles.show');
 
 // Feed Laporan
 Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');
@@ -73,6 +74,8 @@ Route::prefix('admin')->group(function () {
     Route::get('/artikel', [ArtikelController::class, 'index'])->name('admin.articles');
     Route::get('/artikel/buat', [ArtikelController::class, 'create'])->name('admin.articles.create');
     Route::post('/artikel/simpan', [ArtikelController::class, 'store'])->name('admin.articles.store');
+    Route::get('/artikel/{artikel}/edit', [ArtikelController::class, 'edit'])->name('admin.articles.edit');
+    Route::patch('/artikel/{artikel}', [ArtikelController::class, 'update'])->name('admin.articles.update');
 
     // Logout
     Route::any('/logout', function () {

@@ -1,12 +1,3 @@
-@php
-    // Data contoh sementara. Nanti backend mengirim daftar artikel dengan nama variabel yang sama.
-    $articles ??= [
-        ['id' => 1, 'title' => 'Cara melaporkan kerusakan fasilitas umum', 'date' => '12 Agustus 2026', 'status' => 'Dipublikasi'],
-        ['id' => 2, 'title' => 'Progres perbaikan jalan bulan ini',         'date' => '8 Agustus 2026',  'status' => 'Dipublikasi'],
-        ['id' => 3, 'title' => 'Kenapa laporan warga penting?',              'date' => '2 Agustus 2026',  'status' => 'Dipublikasi'],
-    ];
-@endphp
-
 <x-layouts.admin title="Artikel">
     @if (session('success'))
         <div class="mb-6 flex items-center gap-2 rounded-card border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
@@ -29,6 +20,7 @@
             <table class="w-full min-w-[500px] text-left text-sm">
                 <thead>
                     <tr class="border-y border-line bg-surface-muted text-ink-muted">
+                        <th scope="col" class="px-5 py-3 font-medium">Gambar</th>
                         <th scope="col" class="px-5 py-3 font-medium">Judul Artikel</th>
                         <th scope="col" class="px-5 py-3 font-medium">Tanggal</th>
                         <th scope="col" class="px-5 py-3 font-medium">Status</th>
@@ -38,11 +30,18 @@
                 <tbody>
                     @foreach ($articles as $article)
                         <tr class="border-b border-line transition hover:bg-surface-muted">
-                            <td class="px-5 py-4 font-medium text-ink">{{ $article['title'] }}</td>
-                            <td class="px-5 py-4 text-ink-muted">{{ $article['created_at'] }}</td>
-                            <td class="px-5 py-4 font-medium text-green-600">{{ $article['status'] }}</td>
                             <td class="px-5 py-4">
-                                <a href="#" class="text-sm font-medium text-brand-600 transition hover:text-brand-800">Edit</a>
+                                @if ($article->image)
+                                    <img src="{{ asset('storage/' . $article->image) }}" alt="" class="size-14 rounded-lg object-cover">
+                                @else
+                                    <div class="grid size-14 place-items-center rounded-lg bg-surface-muted text-xs text-ink-muted">Tidak ada</div>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 font-medium text-ink">{{ $article->title }}</td>
+                            <td class="px-5 py-4 text-ink-muted">{{ $article->created_at?->translatedFormat('d F Y') }}</td>
+                            <td class="px-5 py-4 font-medium text-green-600">{{ $article->status === 'published' ? 'Dipublikasi' : 'Draft' }}</td>
+                            <td class="px-5 py-4">
+                                <a href="{{ route('admin.articles.edit', $article) }}" class="text-sm font-medium text-brand-600 transition hover:text-brand-800">Edit</a>
                             </td>
                         </tr>
                     @endforeach

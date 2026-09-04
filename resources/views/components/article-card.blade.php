@@ -1,7 +1,7 @@
 @props(['article'])
 
 <article class="group overflow-hidden rounded-card border border-line bg-surface transition hover:shadow-md">
-    <a href="#" class="block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600">
+    <a href="{{ route('articles.show', $article) }}" class="block focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600">
         {{-- Tampilkan Foto dari DB jika ada, atau Placeholder jika kosong --}}
         @if (!empty($article->image))
             <img 
