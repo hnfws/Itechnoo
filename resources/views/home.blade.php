@@ -1,14 +1,5 @@
 @php
-    // Data contoh sementara untuk menampilkan layout.
-    // Nanti backend tinggal mengirim data dengan nama variabel yang sama.
     $announcement ??= 'Saat ini sedang dilakukan perbaikan jalan di Jl Letjen Soeprapto. Mohon maaf apabila perbaikan saat ini mengganggu perjalanan anda. Harap gunakan jalur alternatif.';
-
-
-    $articles ??= [
-        ['title' => 'Cara melaporkan kerusakan fasilitas umum', 'date' => '12 Agustus 2026', 'excerpt' => 'Panduan singkat mengirim laporan agar cepat ditindaklanjuti petugas.'],
-        ['title' => 'Progres perbaikan jalan bulan ini', 'date' => '8 Agustus 2026', 'excerpt' => 'Rekap titik perbaikan yang sudah selesai dikerjakan di wilayah kota.'],
-        ['title' => 'Kenapa laporan warga penting?', 'date' => '2 Agustus 2026', 'excerpt' => 'Data dari warga membantu prioritas anggaran perbaikan infrastruktur.'],
-    ];
 @endphp
 
 <x-layouts.app title="Beranda">
@@ -35,9 +26,11 @@
             <x-section-heading title="Artikel" />
 
             <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach ($articles as $article)
+                @forelse ($articles as $article)
                     <x-article-card :article="$article" />
-                @endforeach
+                @empty
+                    <p class="col-span-full text-center text-ink-muted">Belum ada artikel yang diterbitkan.</p>
+                @endforelse
             </div>
 
             <div class="mt-8 flex justify-center">

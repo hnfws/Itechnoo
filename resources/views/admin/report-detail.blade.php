@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    {{-- Satu form besar yang membungkus status + tombol Submit/Cancel/Hapus --}}
+    {{-- Satu form besar yang membungkus status + tombol Submit/Cancel --}}
     <form
         id="report-form"
         method="POST"
@@ -30,24 +30,12 @@
                     <span class="text-ink-muted">Skala Prioritas :</span>
                     <x-admin.priority :level="$report->priority_score ?? 'rendah'" />
                 </span>
-            </div>
-
-        {{-- Kolom kanan: detail --}}
-        <x-card>
-            <div class="flex items-start justify-between gap-4">
-                <dl class="space-y-1 text-sm">
-                    <div><span class="text-ink-muted">Judul Laporan :</span> <span class="font-medium text-ink">{{ $report->title }}</span></div>
-                    <div><span class="text-ink-muted">Nama Pelapor :</span> <span class="font-medium text-ink">{{ $report->reporter }}</span></div>
-                    <div><span class="text-ink-muted">Lokasi :</span> <span class="font-medium text-ink">{{ $report->location }}</span></div>
-                    <div><span class="text-ink-muted">Deskripsi :</span> <span class="font-medium text-ink">{{ $report->description }}</span></div>
-                </dl>
-
 
                 <div class="inline-flex items-center gap-2 rounded-full border border-line bg-surface-muted px-4 py-1.5 text-sm">
                     <span class="text-ink-muted">Status :</span>
                     <select
                         name="status"
-                        class="border-0 bg-transparent text-sm font-medium focus:outline-none {{ $report->status_color }}"
+                        class="border-0 bg-transparent text-sm font-medium focus:outline-none {{ $report->status_color ?? '' }}"
                         aria-label="Ubah status laporan"
                     >
                         @foreach (\App\Models\Report::STATUSES as $value => $label)
@@ -75,7 +63,7 @@
                     >
                 @else
                     <div class="grid h-56 place-items-center rounded-card border border-line bg-surface text-sm font-medium text-ink-muted shadow-sm">
-                        Foto
+                        Foto Tidak Tersedia
                     </div>
                 @endif
 
@@ -87,7 +75,7 @@
                     Submit
                 </button>
 
-                {{-- Cancel: reset dropdown ke nilai asal lalu kembali ke daftar --}}
+                {{-- Cancel: kembali ke daftar --}}
                 <a
                     href="{{ route('admin.reports') }}"
                     class="inline-flex w-full items-center justify-center rounded-lg border border-line bg-surface px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-surface-muted"
@@ -137,7 +125,7 @@
         </div>
     </form>
 
-    {{-- Form Hapus terpisah — di luar form utama agar tidak campur --}}
+    {{-- Form Hapus terpisah --}}
     <form
         method="POST"
         action="{{ route('admin.reports.destroy', $report->id) }}"

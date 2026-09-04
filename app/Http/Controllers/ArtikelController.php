@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 
 class ArtikelController extends Controller
 {
+    public function publicIndex()
+    {
+        $articles = Artikel::where('status', 'published')
+            ->latest()
+            ->paginate(9);
+
+        return view('articles', compact('articles')); // Memanggil view artikel publik
+    }
     // TAMBAHKAN METHOD INDEX INI
     public function index()
     {
@@ -37,7 +45,7 @@ class ArtikelController extends Controller
             'title'    => $validated['title'],
             'content'  => $validated['content'],
             'image'    => $imagePath,
-            'status'   => 'published',
+            'status'   => 'draft', // Default status
         ]);
 
         return redirect()->route('admin.articles')->with('success', 'Artikel berhasil disimpan!');

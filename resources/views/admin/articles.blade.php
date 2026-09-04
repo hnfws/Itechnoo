@@ -39,7 +39,7 @@
                     @foreach ($articles as $article)
                         <tr class="border-b border-line transition hover:bg-surface-muted">
                             <td class="px-5 py-4 font-medium text-ink">{{ $article['title'] }}</td>
-                            <td class="px-5 py-4 text-ink-muted">{{ $article['date'] }}</td>
+                            <td class="px-5 py-4 text-ink-muted">{{ $article['created_at'] }}</td>
                             <td class="px-5 py-4 font-medium text-green-600">{{ $article['status'] }}</td>
                             <td class="px-5 py-4">
                                 <a href="#" class="text-sm font-medium text-brand-600 transition hover:text-brand-800">Edit</a>
