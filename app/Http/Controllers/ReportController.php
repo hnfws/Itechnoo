@@ -86,9 +86,9 @@ class ReportController extends Controller
      */
     public function show($id)
     {
-        $report = Report::findOrFail($id);
-        // Memanggil file resources/views/report-detail.blade.php
-        return view('report-detail', compact('report'));
+        $report = Report::withCount('upvotes')->findOrFail($id);
+    
+    return view('report-detail', compact('report'));
     }
 
     public function reanalyze($id)
@@ -111,6 +111,13 @@ class ReportController extends Controller
 
         return back()->with('success', 'Analisis AI berhasil diperbarui.');
     }
+
+    public function adminShow($id)
+{
+$report = Report::withCount('upvotes')->findOrFail($id);
+    
+    return view('admin.report-detail', compact('report'));
+}
 
     /**
      * Logika Upvote Dukungan Warga
@@ -155,6 +162,23 @@ class ReportController extends Controller
             ? 'Kamu sudah mendukung laporan ini.'
             : 'Dukungan berhasil ditambahkan.');
     }
+
+    /**
+ * Memperbarui Status Laporan oleh Admin
+ */
+public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|string|in:belum diverifikasi,terverifikasi,terverifikasi_in_progress,resolved,rejected',
+    ]);
+
+    $report = Report::findOrFail($id);
+    $report->update([
+        'status' => $request->status,
+    ]);
+
+    return back()->with('success', 'Status laporan berhasil diperbarui!');
+}
 
     public function adminDashboard()
     {
@@ -204,6 +228,7 @@ class ReportController extends Controller
             ];
         });
 
+        
         // 3. Kirim Data ke View Blade
         return view('admin.reports', compact('stats', 'reports'));
     }

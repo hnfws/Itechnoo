@@ -59,6 +59,16 @@ Route::prefix('admin')->group(function () {
         ->whereNumber('id')
         ->name('admin.reports.show');
 
+    // TAMBAHKAN ROUTE UPDATE STATUS INI
+    Route::patch('/laporan/{id}/status', [ReportController::class, 'updateStatus'])
+        ->whereNumber('id')
+        ->name('admin.reports.status');
+
+    // TAMBAHKAN ROUTE HAPUS LAPORAN INI (OPSIONAL)
+    Route::delete('/laporan/{id}', [ReportController::class, 'destroy'])
+        ->whereNumber('id')
+        ->name('admin.reports.destroy');
+
     // Kelola Artikel Admin
     Route::get('/artikel', [ArtikelController::class, 'index'])->name('admin.articles');
     Route::get('/artikel/buat', [ArtikelController::class, 'create'])->name('admin.articles.create');

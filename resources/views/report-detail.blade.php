@@ -1,4 +1,3 @@
-
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 @endpush
@@ -30,7 +29,8 @@
     <div class="border-b border-line bg-surface-muted">
         <x-container class="flex flex-wrap items-center justify-between gap-3 py-4">
             <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
-                    <span class="font-semibold text-ink">Laporan #{{ str_pad($report->id, 7, '0', STR_PAD_LEFT) }}</span>                <span class="text-sm text-ink-muted">
+                <span class="font-semibold text-ink">Laporan #{{ str_pad($report->id, 7, '0', STR_PAD_LEFT) }}</span>                
+                <span class="text-sm text-ink-muted">
                     Status :
                     <span class="font-medium {{ $report->status_color }}">{{ $report->status_label }}</span>
                 </span>
@@ -48,8 +48,8 @@
             <div class="space-y-6">
                 <div id="report-map" class="h-56 rounded-card border border-line bg-surface-muted"></div>
                 <div class="h-56 overflow-hidden rounded-card border border-line bg-surface-muted">
-    <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="h-full w-full object-cover">
-</div>
+                    <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="h-full w-full object-cover">
+                </div>
             </div>
 
             {{-- Kolom kanan: detail laporan --}}
@@ -68,6 +68,17 @@
                         <span class="font-medium text-ink">{{ $report->location }}</span>
                     </div>
                 </dl>
+
+                {{-- Bagian Upvote Dukungan --}}
+                <div class="mt-4 flex items-center justify-between border-t border-b border-line py-3">
+                    <span class="text-sm text-ink-muted">Dukungan Warga :</span>
+                    <form action="{{ route('reports.upvote', $report->id) }}" method="POST">
+                        @csrf
+                        <x-button type="submit" size="sm" variant="outline" class="rounded-full">
+                            👍 Dukung ({{ $report->upvotes_count ?? 0 }})
+                        </x-button>
+                    </form>
+                </div>
 
                 <p class="mt-4 text-sm text-ink-muted">Deskripsi :</p>
                 <div class="mt-1 rounded-lg bg-brand-50 p-4 text-sm leading-relaxed text-ink">

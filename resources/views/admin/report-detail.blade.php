@@ -104,7 +104,7 @@
 
                     <div class="shrink-0 text-center">
                         <div class="grid size-12 place-items-center rounded-lg border border-line text-sm font-semibold text-ink tabular-nums">
-                            {{ $report->upvotes ?? 0 }}
+                            {{ $report->upvotes_count ?? 0 }}
                         </div>
                         <span class="mt-1 block text-[11px] font-medium text-ink-muted">Upvote</span>
                     </div>
