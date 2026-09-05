@@ -28,8 +28,8 @@
 
 <article class="relative flex flex-col gap-4 rounded-card border border-line bg-surface p-4 transition hover:border-brand-300 hover:shadow-sm sm:flex-row sm:items-start sm:gap-5">
     
-    {{-- Container Mini Peta --}}
-    <div class="relative z-0 h-32 w-full shrink-0 overflow-hidden rounded-lg border border-line sm:size-24">
+    {{-- Container Mini Peta (Tambahkan cursor-pointer & z-20 agar dapat diklik) --}}
+    <div class="relative z-20 h-32 w-full shrink-0 overflow-hidden rounded-lg border border-line sm:size-24 cursor-pointer" title="Buka di Google Maps">
         <div id="card-map-{{ $id }}" class="h-full w-full"></div>
     </div>
 
@@ -53,12 +53,12 @@
         <p class="text-sm leading-relaxed text-ink-muted">&ldquo;{{ $description }}&rdquo;</p>
     </div>
 
-    <div class="relative z-10 shrink-0 sm:w-20">
+    <div class="relative z-20 shrink-0 sm:w-20">
         <form action="{{ route('reports.upvote', $id) }}" method="POST" onsubmit="submitUpvote(event, this)">
             @csrf
             <button
                 type="submit"
-            id="upvote-btn-{{ $id }}"
+                id="upvote-btn-{{ $id }}"
                 class="flex w-full flex-col items-center gap-0.5 rounded-lg border px-3 py-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 {{ $hasUpvoted ? 'border-brand-400 bg-brand-50 text-brand-700' : 'border-line text-ink-muted hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700' }}"
                 aria-label="{{ $hasUpvoted ? 'Sudah mendukung laporan' : 'Upvote laporan' }} {{ $title }}"
                 {{ $hasUpvoted ? 'disabled' : '' }}
@@ -92,6 +92,16 @@
 
         // Tambahkan pin marker
         L.marker([lat, lng]).addTo(cardMap);
+
+        // Event listener saat area peta mini diklik
+        cardMap.on('click', function(e) {
+            // Hentikan penjalaran klik ke link induk card (apabila ada link overlay)
+            if (e.originalEvent) {
+                e.originalEvent.stopPropagation();
+            }
+            var googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            window.open(googleMapsUrl, '_blank');
+        });
 
         setTimeout(function() {
             cardMap.invalidateSize();
