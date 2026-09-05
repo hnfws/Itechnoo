@@ -6,6 +6,17 @@
     $title = is_array($report) ? $report['title'] : $report->title;
     $location = is_array($report) ? $report['location'] : $report->location;
     $description = is_array($report) ? $report['description'] : $report->description;
+    $status = is_array($report) ? ($report['status'] ?? 'belum diverifikasi') : $report->status;
+    $statusLabel = is_array($report)
+        ? (\App\Models\Report::STATUSES[$status] ?? $status)
+        : $report->status_label;
+    $statusStyle = match ($status) {
+        'terverifikasi' => 'border-green-200 bg-green-50 text-green-700',
+        'terverifikasi_in_progress' => 'border-blue-200 bg-blue-50 text-blue-700',
+        'resolved' => 'border-emerald-200 bg-emerald-50 text-emerald-700',
+        'rejected' => 'border-red-200 bg-red-50 text-red-700',
+        default => 'border-amber-200 bg-amber-50 text-amber-700',
+    };
     $upvotes = is_array($report) ? ($report['upvotes'] ?? 0) : ($report->upvote_count ?? $report->upvotes()->count());
     $lat = is_array($report) ? ($report['latitude'] ?? null) : $report->latitude;
     $lng = is_array($report) ? ($report['longitude'] ?? null) : $report->longitude;
@@ -23,11 +34,14 @@
     </div>
 
     <div class="min-w-0 flex-1 space-y-1">
-        <h3 class="font-semibold text-ink">
+        <h3 class="flex flex-wrap items-center gap-2 font-semibold text-ink">
             <span class="text-ink-muted">Judul Laporan :</span>
             <a href="{{ route('reports.show', $id) }}" class="after:absolute after:inset-0 after:rounded-card focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-brand-600">
                 {{ $title }}
             </a>
+            <span class="relative z-10 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusStyle }}">
+                Status: {{ $statusLabel }}
+            </span>
         </h3>
 
         <p class="text-sm text-ink">

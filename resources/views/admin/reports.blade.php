@@ -10,7 +10,7 @@
     {{-- Panel daftar laporan --}}
     <div class="mt-6 rounded-card border border-line bg-surface shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-3 p-5">
-            <h2 class="text-base font-semibold text-ink">Recent Reports</h2>
+            <h2 class="text-base font-semibold text-ink">Laporan Terbaru</h2>
 
             <div class="flex flex-wrap items-center gap-2">
                 <label class="relative">
