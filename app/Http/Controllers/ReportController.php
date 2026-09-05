@@ -192,7 +192,7 @@ public function updateStatus(Request $request, $id)
     return back()->with('success', 'Status laporan berhasil diperbarui!');
 }
 
-    public function adminDashboard()
+    public function adminDashboard(Request $request)
 {
     $stats = [
         'total'       => Report::count(),
@@ -201,7 +201,27 @@ public function updateStatus(Request $request, $id)
         'done'        => Report::where('status', 'resolved')->count(),
     ];
 
-    $reports = Report::latest()->get()->map(function ($report) {
+    $search = $request->boolean('clear_search')
+        ? ''
+        : trim((string) $request->query('search', ''));
+    $status = $request->query('status', '');
+
+    $reportQuery = Report::query()->latest();
+
+    if ($search !== '') {
+        $reportQuery->where(function ($query) use ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('reporter', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhere('location', 'like', "%{$search}%");
+        });
+    }
+
+    if (array_key_exists($status, Report::STATUSES)) {
+        $reportQuery->where('status', $status);
+    }
+
+    $reports = $reportQuery->get()->map(function ($report) {
         $statusLabel = match ($report->status) {
             'terverifikasi'             => 'Terverifikasi',
             'terverifikasi_in_progress' => 'Proses Penanganan',
@@ -227,6 +247,6 @@ public function updateStatus(Request $request, $id)
         ];
     });
 
-    return view('admin.reports', compact('stats', 'reports'));
+    return view('admin.reports', compact('stats', 'reports', 'search', 'status'));
 }
 }

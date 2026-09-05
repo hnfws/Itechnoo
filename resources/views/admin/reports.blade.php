@@ -12,23 +12,42 @@
         <div class="flex flex-wrap items-center justify-between gap-3 p-5">
             <h2 class="text-base font-semibold text-ink">Laporan Terbaru</h2>
 
-            <div class="flex flex-wrap items-center gap-2">
+            <form method="GET" action="{{ route('admin.reports') }}" class="flex flex-wrap items-center gap-2">
                 <label class="relative">
                     <span class="sr-only">Cari laporan</span>
                     <svg class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <circle cx="11" cy="11" r="7" />
                         <path d="M21 21l-4-4" stroke-linecap="round" />
                     </svg>
-                    <input type="search" placeholder="Search Bar" class="h-10 w-48 rounded-full border border-line bg-surface pr-4 pl-9 text-sm text-ink placeholder:text-ink-muted focus:outline-2 focus:outline-offset-0 focus:outline-brand-600">
+                    <input type="search" name="search" value="{{ $search ?? '' }}" placeholder="Search Bar" class="h-10 w-48 rounded-full border border-line bg-surface pr-9 pl-9 text-sm text-ink placeholder:text-ink-muted focus:outline-2 focus:outline-offset-0 focus:outline-brand-600">
+                    @if (($search ?? '') !== '')
+                        <button type="submit" name="clear_search" value="1" class="absolute top-1/2 right-3 grid size-5 -translate-y-1/2 place-items-center text-lg leading-none text-brand-600 transition hover:text-brand-700" aria-label="Hapus pencarian">
+                            &times;
+                        </button>
+                    @endif
                 </label>
 
-                <button type="button" class="flex h-10 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-ink transition hover:bg-surface-muted">
-                    Status
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M4 6h16M6 12h12M9 18h6" stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
+                <details class="relative">
+                    <summary class="flex h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-line px-4 text-sm font-medium text-ink transition hover:bg-surface-muted focus:outline-2 focus:outline-offset-0 focus:outline-brand-600 [&::-webkit-details-marker]:hidden">
+                        {{ $status !== '' ? (\App\Models\Report::STATUSES[$status] ?? 'Filter') : 'Filter' }}
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M4 6h16M6 12h12M9 18h6" stroke-linecap="round" />
+                        </svg>
+                    </summary>
+                    <div class="absolute right-0 z-10 mt-2 min-w-48 rounded-xl border border-line bg-surface p-1 shadow-lg">
+                        <button type="submit" name="status" value="" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition hover:bg-surface-muted">
+                            Hapus filter
+                        </button>
+                        @foreach (\App\Models\Report::STATUSES as $value => $label)
+                            <button type="submit" name="status" value="{{ $value }}" class="block w-full rounded-lg px-3 py-2 text-left text-sm text-ink transition hover:bg-surface-muted">
+                                {{ $label }}
+                            </button>
+                        @endforeach
+                    </div>
+                </details>
+
+                <button type="submit" class="sr-only">Terapkan filter</button>
+            </form>
         </div>
 
         <div class="overflow-x-auto">

@@ -3,6 +3,16 @@
 @endphp
 
 <x-layouts.admin title="Laporan">
+    <a
+        href="{{ route('admin.reports') }}"
+        class="mb-4 inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+    >
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Kembali
+    </a>
+
     @if (session('success'))
         <div class="mb-4 flex items-center gap-2 rounded-card border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
             <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
