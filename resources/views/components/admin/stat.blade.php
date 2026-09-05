@@ -8,7 +8,7 @@
     $valueColor = [
         'default' => 'text-ink',
         'high' => 'text-danger',
-        'medium' => 'text-amber-500',
+        'medium' => 'text-accent',
         'low' => 'text-green-600',
     ][$accent] ?? 'text-ink';
 @endphp
