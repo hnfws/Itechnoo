@@ -90,9 +90,10 @@
             <span class="font-medium text-ink">{{ $report->title }}</span>
           </div>
           <div>
-            <span class="text-ink-muted">Nama Pelapor :</span>
-            <span class="font-medium text-ink">{{ $report->reporter }}</span>
-          </div>
+<div>
+    <span class="text-ink-muted">Nama Pelapor :</span>
+    <span class="font-medium text-ink">{{ $report->formatted_reporter }}</span>
+</div>
           <div>
             <span class="text-ink-muted">Lokasi :</span>
             <span class="font-medium text-ink">{{ $report->location }}</span>

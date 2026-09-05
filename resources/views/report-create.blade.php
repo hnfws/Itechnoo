@@ -166,8 +166,9 @@
 
             {{-- Persetujuan --}}
             <div class="space-y-3">
-                <x-checkbox name="show_name">Tampilkan nama pada laporan</x-checkbox>
-                <x-checkbox name="agreement">
+<x-checkbox name="show_name" value="1" :checked="old('show_name', true)">
+    Tampilkan nama pada laporan
+</x-checkbox>                <x-checkbox name="agreement">
                     Dengan ini saya menyatakan laporan yang saya buat benar sebenar benarnya, dan siap menerima
                     hukuman sesuai dengan undang undang yang berlaku apabila laporan bersifat palsu.
                 </x-checkbox>

@@ -36,50 +36,53 @@ class ReportController extends Controller
         return view('report-create');
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'reporter'    => 'required|string|max:255',
-            'phone'       => 'required|string|max:20',
-            'description' => 'required|string',
-            'image'       => 'required|image|mimes:jpg,jpeg,png|max:5120',
-            'location'    => 'required|string|max:255',
-            'latitude'    => 'nullable|numeric|between:-90,90',
-            'longitude'   => 'nullable|numeric|between:-180,180',
-            'agreement'   => 'accepted',
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'title'       => 'required|string|max:255',
+        'reporter'    => 'required|string|max:255',
+        'phone'       => 'required|string|max:20',
+        'description' => 'required|string',
+        'image'       => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        'location'    => 'required|string|max:255',
+        'latitude'    => 'nullable|numeric|between:-90,90',
+        'longitude'   => 'nullable|numeric|between:-180,180',
+        'show_name'   => 'nullable', // <--- 1. TAMBAHKAN VALIDASI INI
+        'agreement'   => 'accepted',
+    ]);
+
+    $reporterKey = $this->getReporterKey();
+    $imagePath = $request->file('image')->store('reports', 'public');
+
+    $report = Report::create([
+        'reporter_key'   => $reporterKey,
+        'title'          => $validated['title'],
+        'reporter'       => $validated['reporter'],
+        'phone'          => $validated['phone'],
+        'description'    => $validated['description'],
+        'image'          => $imagePath,
+        'location'       => $validated['location'],
+        'latitude'       => $validated['latitude'] ?? null,
+        'longitude'      => $validated['longitude'] ?? null,
+        'show_name'      => $request->has('show_name'), // <--- 2. TAMBAHKAN NATIVE BOOLEAN CONVERSION INI
+    ]);
+
+    $aiAnalysis = GeminiService::analyzeReport($imagePath, $validated['description']);
+    if ($aiAnalysis !== null) {
+        $report->update([
+            'severity'       => $aiAnalysis['severity'] ?? 'Sedang',
+            'urgency'        => $aiAnalysis['urgency'] ?? 'Normal',
+            'potential_risk' => $aiAnalysis['potential_risk'] ?? null,
+            'ai_masyarakat'  => $aiAnalysis['ai_masyarakat'] ?? null,
+            'ai_adm'         => $aiAnalysis['ai_adm'] ?? null,
         ]);
-
-        $reporterKey = $this->getReporterKey();
-        $imagePath = $request->file('image')->store('reports', 'public');
-        $report = Report::create([
-            'reporter_key'   => $reporterKey,
-            'title'          => $validated['title'],
-            'reporter'       => $validated['reporter'],
-            'phone'          => $validated['phone'],
-            'description'    => $validated['description'],
-            'image'          => $imagePath,
-            'location'       => $validated['location'],
-            'latitude'       => $validated['latitude'] ?? null,
-            'longitude'      => $validated['longitude'] ?? null,
-        ]);
-
-        $aiAnalysis = GeminiService::analyzeReport($imagePath, $validated['description']);
-        if ($aiAnalysis !== null) {
-            $report->update([
-                'severity'       => $aiAnalysis['severity'] ?? 'Sedang',
-                'urgency'        => $aiAnalysis['urgency'] ?? 'Normal',
-                'potential_risk' => $aiAnalysis['potential_risk'] ?? null,
-                'ai_masyarakat'  => $aiAnalysis['ai_masyarakat'] ?? null,
-                'ai_adm'         => $aiAnalysis['ai_adm'] ?? null,
-            ]);
-        }
-
-        $report->recalculatePriorityScore();
-
-        return redirect()->route('reports.show', ['id' => $report->id])
-            ->with('success', 'Laporan berhasil terkirim!');
     }
+
+    $report->recalculatePriorityScore();
+
+    return redirect()->route('reports.show', ['id' => $report->id])
+        ->with('success', 'Laporan berhasil terkirim!');
+}
 
     /**
      * Menampilkan Halaman Detail Laporan

@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->foreignId('admin_id')->nullable()->constrained('admins')->onDelete('set null');
             $table->string('reporter');
             $table->string('phone');
+            $table->boolean('show_name')->default(false);
 
 
             $table->string('title');

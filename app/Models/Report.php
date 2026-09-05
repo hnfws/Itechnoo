@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Report extends Model
 {
@@ -38,6 +39,7 @@ class Report extends Model
         'ai_masyarakat',
         'ai_adm',
         'status',
+        'show_name',
     ];
 
     public function admin(): BelongsTo
@@ -92,4 +94,36 @@ class Report extends Model
         $this->priority_score = round($severityWeight + $upvoteWeight, 2);
         $this->save();
     }
+
+    /**
+     * Accessor untuk mendapatkan nama pelapor yang ter-sensor dinamis berdasarkan huruf depan nama.
+     * Dipanggil di Blade dengan: $report->formatted_reporter
+     */
+    public function getFormattedReporterAttribute(): string
+    {
+        // 1. Jika show_name = true (centang), tampilkan nama asli
+        if ($this->show_name) {
+            return $this->reporter;
+        }
+
+        // 2. Jika nama kosong
+        if (empty($this->reporter)) {
+            return 'Anonim';
+        }
+
+        // 3. Sensor kata per kata berdasarkan huruf depan masing-masing kata
+        $words = explode(' ', trim($this->reporter));
+        $maskedWords = array_map(function ($word) {
+            if (empty($word)) return '';
+            
+            // Mengambil 1 huruf pertama dari kata tersebut
+            $firstLetter = Str::substr($word, 0, 1); 
+            
+            // Menggabungkan huruf pertama dengan bintang
+            return $firstLetter . '****'; 
+        }, $words);
+
+        return implode(' ', $maskedWords);
+    }
+
 }
