@@ -1,12 +1,8 @@
-@php
-    $announcement ??= 'Saat ini sedang dilakukan perbaikan jalan di Jl Letjen Soeprapto. Mohon maaf apabila perbaikan saat ini mengganggu perjalanan anda. Harap gunakan jalur alternatif.';
-@endphp
-
 <x-layouts.app title="Beranda">
     {{-- 1. Mengoper $mapReports (Semua lokasi) ke Peta --}}
     <x-hero :reports="$mapReports" />
 
-    <x-announcement-bar :text="$announcement" />
+    <x-announcement-bar :reports="$inProgressReports" />
 
     <x-container class="py-10">
         <x-section-heading title="Laporan Pengaduan">
