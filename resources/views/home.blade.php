@@ -3,7 +3,8 @@
 @endphp
 
 <x-layouts.app title="Beranda">
-    <x-hero />
+    {{-- 1. Mengoper $mapReports (Semua lokasi) ke Peta --}}
+    <x-hero :reports="$mapReports" />
 
     <x-announcement-bar :text="$announcement" />
 
@@ -15,7 +16,8 @@
         </x-section-heading>
 
         <div class="mt-6 space-y-4">
-            @foreach ($reports as $report)
+            {{-- 2. Menggunakan $latestReports (2 Laporan Terbaru) --}}
+            @foreach ($latestReports as $report)
                 <x-report-card :report="$report" />
             @endforeach
         </div>

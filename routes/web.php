@@ -3,6 +3,8 @@
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AdminController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,7 +54,7 @@ Route::prefix('admin')->group(function () {
     Route::view('/', 'admin.welcome')->name('admin.welcome');
 
     // Dashboard & Laporan Admin
-    Route::get('/dashboard', [ReportController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/laporan', [ReportController::class, 'adminDashboard'])->name('admin.reports');
 
     // Detail Laporan Admin (Diperbaiki: Menggunakan Controller)
