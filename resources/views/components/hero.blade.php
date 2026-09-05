@@ -1,14 +1,16 @@
-<section class="relative isolate aspect-[16/7] min-h-[320px] w-full overflow-hidden border-b border-line bg-surface-muted">
+<section class="relative isolate w-full overflow-hidden border-b border-line bg-surface-muted" style="height: clamp(280px, 26vw, 420px);">
     {{-- Container Peta --}}
     <div id="overview-map" class="size-full z-0"></div>
 
     {{-- Overlay Informasi --}}
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-20 pb-8">
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-20 pb-8">
         <x-container>
-            <p class="text-xs font-medium text-white/80">Kota Malang</p>
-            <h1 class="mt-1 text-xl font-semibold text-white sm:text-2xl">
-                Laporkan kerusakan fasilitas umum di sekitarmu
-            </h1>
+            <div class="w-fit max-w-full rounded-lg bg-black/55 px-4 py-3 backdrop-blur-md">
+                <p class="text-xs font-semibold text-white" style="text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);">Selamat Datang!</p>
+                <h1 class="mt-1 text-xl font-semibold text-white sm:text-2xl" style="text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);">
+                    Laporkan kerusakan fasilitas umum di sekitarmu
+                </h1>
+            </div>
         </x-container>
     </div>
 </section>
