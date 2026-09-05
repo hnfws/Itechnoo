@@ -1,12 +1,17 @@
-
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  /* Menambahkan efek cursor pointer agar pengguna tahu peta/marker bisa diklik */
+  #report-map {
+    cursor: pointer;
+  }
+</style>
 @endpush
 
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
- document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function () {
     const latitude = @json($report->latitude);
     const longitude = @json($report->longitude);
     const mapElement = document.getElementById('report-map');
@@ -15,13 +20,38 @@
       mapElement.textContent = 'Koordinat lokasi belum tersedia.';
       mapElement.classList.add('grid', 'place-items-center', 'text-sm', 'text-ink-muted');
     } else {
+      // 1. URL Google Maps
+      const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      // 2. Inisialisasi Peta
       const map = L.map(mapElement).setView([latitude, longitude], 15);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
       }).addTo(map);
-      L.marker([latitude, longitude]).addTo(map);
-    }
 
+      // 3. Tambahkan Marker
+      const marker = L.marker([latitude, longitude]).addTo(map);
+
+      // Popup opsional saat dipencet
+      marker.bindPopup(`
+        <div class="p-1 text-center">
+          <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-blue-600 underline">
+            📍 Buka di Google Maps
+          </a>
+        </div>
+      `);
+
+      // 4. Klik Marker langsung buka Google Maps
+      marker.on('click', function () {
+        window.open(googleMapsUrl, '_blank');
+      });
+
+      // 5. Klik area mana saja pada Peta langsung buka Google Maps
+      map.on('click', function () {
+        window.open(googleMapsUrl, '_blank');
+      });
+    }
   });
 </script>
 @endpush
