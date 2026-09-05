@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'windy' => [
+    'key' => env('WINDY_API_KEY'),
+],
 'groq' => [
     'key' => env('GROQ_API_KEY'),
     'model' => env('GROQ_MODEL', 'llama-3.2-11b-vision-instruct'),

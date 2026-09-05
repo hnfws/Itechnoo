@@ -11,23 +11,30 @@
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('upload-text').innerText = "Foto terpilih: " + input.files[0].name;
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         var map = L.map('map').setView([-6.200000, 106.816666], 13);
+        var marker;
+        var locationInput = document.getElementById('location');
+        var debounceTimer;
+        var isProgrammaticUpdate = false; // Flag untuk cegah konflik pencarian
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        var marker;
         setTimeout(function() {
             map.invalidateSize();
         }, 300);
 
-        // Fungsi Reverse Geocoding untuk mengubah Lat/Lng menjadi Nama Alamat
+        // Fungsi Reverse Geocoding (Lat/Lng -> Nama Alamat)
         function updateAddressFromCoords(lat, lng) {
-            var locationInput = document.getElementById('location');
             if (locationInput) {
-                // Tampilkan indikator memuat alamat
                 locationInput.placeholder = "Mencari alamat lokasi...";
             }
 
@@ -35,15 +42,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.display_name && locationInput) {
+                        isProgrammaticUpdate = true; // Tandai bahwa teks diubah oleh sistem, bukan diketik user
                         locationInput.value = data.display_name;
                     }
                 })
-                .catch(error => {
-                    console.error('Error Reverse Geocoding:', error);
-                });
+                .catch(error => console.error('Error Reverse Geocoding:', error));
         }
 
-        // 1. Deteksi Lokasi Awal Pengguna
+        // 1. Deteksi Lokasi Awal GPS
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var lat = position.coords.latitude;
@@ -60,14 +66,13 @@
                     marker = L.marker([lat, lng]).addTo(map);
                 }
 
-                // Isi otomatis alamat berdasarkan GPS jika kolom alamat masih kosong
-                if (!document.getElementById('location').value) {
+                if (!locationInput.value) {
                     updateAddressFromCoords(lat, lng);
                 }
             });
         }
 
-        // 2. Klik pada Peta
+        // 2. Event Klik Peta
         map.on('click', function(e) {
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
@@ -81,16 +86,49 @@
                 marker = L.marker(e.latlng).addTo(map);
             }
 
-            // Update otomatis input lokasi saat peta diklik
             updateAddressFromCoords(lat, lng);
         });
-    });
 
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            document.getElementById('upload-text').innerText = "Foto terpilih: " + input.files[0].name;
+        // 3. Event Ketik Alamat (Forward Geocoding)
+        if (locationInput) {
+            locationInput.addEventListener('input', function() {
+                // Jika perubahan input dilakukan oleh fungsi reverse geocoding, lewati
+                if (isProgrammaticUpdate) {
+                    isProgrammaticUpdate = false;
+                    return;
+                }
+
+                var query = this.value.trim();
+                if (query.length < 4) return;
+
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                var lat = parseFloat(data[0].lat);
+                                var lng = parseFloat(data[0].lon);
+
+                                // Update nilai Lat/Lng pada input hidden
+                                document.getElementById('latitude').value = lat;
+                                document.getElementById('longitude').value = lng;
+
+                                // Pindahkan Peta dan Marker
+                                map.setView([lat, lng], 16);
+
+                                if (marker) {
+                                    marker.setLatLng([lat, lng]);
+                                } else {
+                                    marker = L.marker([lat, lng]).addTo(map);
+                                }
+                            }
+                        })
+                        .catch(error => console.error('Error Forward Geocoding:', error));
+                }, 800);
+            });
         }
-    }
+    });
 </script>
 @endpush
 

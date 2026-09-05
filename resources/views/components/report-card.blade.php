@@ -24,7 +24,47 @@
     $hasUpvoted = $voterKey && $report instanceof \App\Models\Report
         ? $report->upvotes()->where('voter_key', $voterKey)->exists()
         : false;
+
+    $extremeWeather = is_array($report) ? ($report['extreme_weather'] ?? null) : ($report->extreme_weather ?? null);
 @endphp
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.weather-checker').forEach(function(el) {
+        var lat = el.getAttribute('data-lat');
+        var lng = el.getAttribute('data-lng');
+
+        if (!lat || !lng) return;
+
+        // Tembak API Open-Meteo secara real-time
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=weather_code,wind_speed_10m`)
+            .then(response => {
+                if (!response.ok) throw new Error('Weather API request failed');
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.current) {
+                    var code = data.current.weather_code;
+                    var wind = data.current.wind_speed_10m;
+
+                    // Daftar WMO Weather Code untuk Cuaca Ekstrem:
+                    // 65: Hujan Deras, 67: Hujan Es, 82: Hujan Badai, 95/96/99: Badai Petir
+                    var extremeCodes = [65, 67, 75, 82, 95, 96, 99];
+
+                    // Kriteria Ekstrem: Kode cuaca ekstrem ATAU Kecepatan Angin > 40 km/j
+                    if (extremeCodes.includes(code) || wind > 40) {
+                        el.innerHTML = `
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-600 border border-red-500/20">
+                                ⚠️ Cuaca Ekstrem
+                            </span>
+                        `;
+                    }
+                }
+            })
+            .catch(err => console.error("Gagal memuat data cuaca real-time:", err));
+    });
+});
+</script>
 
 <article class="relative flex flex-col gap-4 rounded-card border border-line bg-surface p-4 transition hover:border-brand-300 hover:shadow-sm sm:flex-row sm:items-start sm:gap-5">
     
@@ -42,6 +82,14 @@
             <span class="relative z-10 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold {{ $statusStyle }}">
                 Status: {{ $statusLabel }}
             </span>
+            <span class="weather-checker relative z-10 inline-flex items-center"
+                  data-lat="{{ $lat }}"
+                  data-lng="{{ $lng }}"></span>
+            @if (!empty($extremeWeather))
+                <span class="relative z-10 inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 animate-pulse">
+                    {{ $extremeWeather }}
+                </span>
+            @endif
         </h3>
 
         <p class="text-sm text-ink">
@@ -90,8 +138,18 @@
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(cardMap);
 
+        // Gunakan URL asset eksplisit agar pin tidak bergantung pada path aplikasi.
+        var reportMarkerIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
         // Tambahkan pin marker
-        L.marker([lat, lng]).addTo(cardMap);
+        L.marker([lat, lng], { icon: reportMarkerIcon }).addTo(cardMap);
 
         // Event listener saat area peta mini diklik
         cardMap.on('click', function(e) {

@@ -8,6 +8,7 @@ use App\Services\GeminiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
+use App\Services\WeatherService;
 
 class ReportController extends Controller
 {
@@ -24,11 +25,19 @@ class ReportController extends Controller
         return $key;
     }
 
-    public function index()
-    {
-        $reports = Report::withCount('upvotes')->latest()->paginate(10);
-        return view('reports', compact('reports'));
-    }
+public function index()
+{
+    $reports = Report::withCount('upvotes')->latest()->paginate(10);
+
+    // Sisipkan pengecekan cuaca ekstrem untuk tiap laporan
+    $reports->getCollection()->transform(function ($report) {
+        // Ambil nama lokasi dari kolom 'location' (atau ganti sesuai nama kolom lokasi di database kamu)
+        $report->extreme_weather = WeatherService::checkExtremeWeather($report->location);
+        return $report;
+    });
+
+    return view('reports', compact('reports'));
+}
 
     public function create()
     {
