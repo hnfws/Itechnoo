@@ -73,15 +73,10 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
 </html>
 --}}
 
-{{-- 
-======================================================================
-🎨 [VERSI DESAIN TEMAN] (AKTIF DITAMPILKAN)
-Tampilan UI statistik modern buatan teman kelompok.
-======================================================================
---}}
+
 
 @php
-    // Data dummy agar UI bisa tampil tanpa error $reports
+    // Data fallback jika variabel dari controller tidak terdefinisi
     $adminName ??= 'Administrator';
     $stats ??= [
         'total' => 248,
@@ -92,6 +87,8 @@ Tampilan UI statistik modern buatan teman kelompok.
         'in_progress' => 41,
         'done' => 115,
     ];
+    $aiSummary ??= 'Belum ada ringkasan AI untuk hari ini.';
+    $aiSummaryTime ??= '08:00 WIB';
 @endphp
 
 <x-layouts.admin title="Dashboard">
@@ -117,8 +114,29 @@ Tampilan UI statistik modern buatan teman kelompok.
             </div>
         </div>
 
-        <div class="grid min-h-72 place-items-center rounded-card border border-line bg-surface p-6 text-sm font-medium text-ink-muted">
-            AI Summary
+        {{-- Widget AI Summary (Mengisi slot kotak kanan tanpa merusak desain) --}}
+        <div class="flex flex-col justify-between rounded-card border border-line bg-surface p-6 text-sm font-medium text-ink shadow-sm min-h-72">
+            <div>
+                <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">✨</span>
+                        <h3 class="font-bold text-ink">AI Summary</h3>
+                    </div>
+                    <span class="text-[11px] text-ink-muted font-normal bg-surface-muted px-2.5 py-1 rounded-full">
+                        {{ $aiSummaryTime }}
+                    </span>
+                </div>
+                
+                {{-- Hasil Rangkuman AI Ditampilkan di Sini --}}
+                <div class="space-y-2 text-xs leading-relaxed text-ink-muted font-normal">
+                    {!! nl2br(e($aiSummary)) !!}
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-line text-[11px] text-ink-muted flex items-center gap-1.5 font-normal">
+                <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Diperbarui otomatis setiap jam 08:00 WIB
+            </div>
         </div>
     </div>
 

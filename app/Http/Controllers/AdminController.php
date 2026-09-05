@@ -2,86 +2,92 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\Report;
-use Carbon\Carbon;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        $highPriority = Report::query()
-            ->where(function ($query) {
-                $query->where('priority_score', '>=', 80)
-                    ->orWhereRaw('LOWER(severity) IN (?, ?, ?)', ['critical', 'tinggi', 'high']);
-            });
-
-        $mediumPriority = Report::query()
-            ->whereNot(function ($query) {
-                $query->where('priority_score', '>=', 80)
-                    ->orWhereRaw('LOWER(severity) IN (?, ?, ?)', ['critical', 'tinggi', 'high']);
-            })
-            ->where(function ($query) {
-                $query->whereBetween('priority_score', [50, 79.99])
-                    ->orWhereRaw('LOWER(severity) IN (?, ?)', ['medium', 'sedang']);
-            });
-
-        $total = Report::count();
-        $highCount = $highPriority->count();
-        $mediumCount = $mediumPriority->count();
-
+        // 1. Data statistik
         $stats = [
-            'total'       => $total,
-            'high'        => $highCount,
-            'medium'      => $mediumCount,
-            'low'         => max(0, $total - $highCount - $mediumCount),
-            'verified'    => Report::whereIn('status', ['terverifikasi', 'terverifikasi_in_progress', 'resolved'])->count(),
-            'in_progress' => Report::where('status', 'terverifikasi_in_progress')->count(),
+            'total'       => Report::count(),
+            'high'        => Report::where('priority_score', '>=', 8)->count(),
+            'medium'      => Report::whereBetween('priority_score', [4, 7.9])->count(),
+            'low'         => Report::where('priority_score', '<', 4)->count(),
+            'verified'    => Report::where('status', 'verified')->count(),
+            'in_progress' => Report::where('status', 'in_progress')->count(),
             'done'        => Report::where('status', 'resolved')->count(),
         ];
 
-        $reportTrends = [
-            'hari' => $this->buildTrend(Carbon::now()->startOfDay(), 7, 'day'),
-            'bulan' => $this->buildTrend(Carbon::now()->startOfMonth(), 6, 'month'),
-            'tahun' => $this->buildTrend(Carbon::now()->startOfYear(), 5, 'year'),
-        ];
+        // 2. Data laporan agar Blade tidak error
+        $reports = Report::latest()->get();
 
-        $topPriorityReports = Report::query()
-            ->orderByDesc('priority_score')
-            ->limit(5)
-            ->get(['id', 'title', 'priority_score', 'severity', 'status', 'ai_adm']);
+        // 3. AI Summary dari Cache
+        $aiSummaryData = Cache::remember('daily_ai_summary', now()->addHours(24), function () {
+            $latestReports = Report::latest()->take(20)->get(['title', 'location', 'status']);
 
-        $mapReports = Report::query()
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->get(['id', 'title', 'location', 'latitude', 'longitude', 'status', 'priority_score']);
+            if ($latestReports->isEmpty()) {
+                return [
+                    'content'    => 'Belum ada data laporan yang cukup untuk dirangkum.',
+                    'updated_at' => now()->format('H:i') . ' WIB'
+                ];
+            }
 
-        return view('admin.dashboard', [
-            'adminName' => 'Administrator',
-            'stats' => $stats,
-            'reportTrends' => $reportTrends,
-            'topPriorityReports' => $topPriorityReports,
-            'mapReports' => $mapReports,
-        ]);
-    }
+            $apiKey = config('services.gemini_summary.key') ?? config('services.gemini.key');
+            $model  = config('services.gemini_summary.model', 'gemini-3.6-flash');
 
-    private function buildTrend(Carbon $periodStart, int $periodCount, string $unit): array
-    {
-        $trend = [];
+            if (!$apiKey) {
+                return [
+                    'content'    => 'API Key Gemini belum diisi di file .env / config.',
+                    'updated_at' => now()->format('H:i') . ' WIB'
+                ];
+            }
 
-        for ($offset = $periodCount - 1; $offset >= 0; $offset--) {
-            $start = $periodStart->copy()->sub($offset, $unit)->startOf($unit);
-            $end = $start->copy()->endOf($unit);
+            $prompt = "Kamu adalah asisten AI Admin Pemerintah. Rangkumkan laporan warga berikut menjadi 3 poin ringkas dalam bahasa Indonesia untuk tindakan hari ini:\n" . json_encode($latestReports);
 
-            $trend[] = [
-                'label' => match ($unit) {
-                    'day' => $start->translatedFormat('d M'),
-                    'month' => $start->translatedFormat('M Y'),
-                    default => $start->format('Y'),
-                },
-                'count' => Report::whereBetween('created_at', [$start, $end])->count(),
+            // Request ke Google Gemini API (menghapus Authorization header agar tidak 401)
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Authorization' => null, // Menghapus Bearer token bawaan Laravel
+                    'Content-Type'  => 'application/json',
+                ])
+                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt]
+                            ]
+                        ]
+                    ]
+                ]);
+
+            if ($response->failed()) {
+                Log::error('Gemini Admin Summary Error: ' . $response->body());
+                $errMsg = $response->json('error.message') ?? 'HTTP ' . $response->status();
+                return [
+                    'content'    => 'Gagal AI Gemini: ' . $errMsg,
+                    'updated_at' => now()->format('H:i') . ' WIB'
+                ];
+            }
+
+            $text = $response->json('candidates.0.content.parts.0.text');
+
+            return [
+                'content'    => $text ?? 'Gagal membaca response dari AI Gemini.',
+                'updated_at' => now()->format('H:i') . ' WIB'
             ];
-        }
+        });
 
-        return $trend;
+        // 4. Kirim ke View
+        return view('admin.dashboard', [
+            'adminName'     => auth()->user()->name ?? 'Administrator',
+            'stats'         => $stats,
+            'reports'       => $reports,
+            'aiSummary'     => $aiSummaryData['content'],
+            'aiSummaryTime' => $aiSummaryData['updated_at'],
+        ]);
     }
 }

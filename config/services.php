@@ -20,6 +20,13 @@ return [
     'key' => env('GROQ_API_KEY'),
     'model' => env('GROQ_MODEL', 'llama-3.2-11b-vision-instruct'),
 ],
+
+
+'gemini_summary' => [
+    'key'   => env('GEMINI_SUMMARY_API_KEY'),
+    'model' => env('GEMINI_SUMMARY_MODEL', 'gemini-3.6-flash'), // Digunakan khusus Admin Summary
+],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
