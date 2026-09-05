@@ -29,7 +29,7 @@
                 <label
                     for="image"
                     data-image-dropzone
-                    class="relative grid min-h-44 cursor-pointer place-items-center overflow-hidden rounded-card border-2 border-dashed border-line bg-surface text-center transition hover:border-brand-400 hover:bg-brand-50"
+                    class="relative grid h-64 cursor-pointer place-items-center overflow-hidden rounded-card border-2 border-dashed border-line bg-surface text-center transition hover:border-brand-400 hover:bg-brand-50"
                 >
                     <div data-image-placeholder class="space-y-2 p-6 {{ $isEdit && $article->image ? 'hidden' : '' }}">
                         <svg class="mx-auto size-8 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -39,7 +39,9 @@
                         <p class="text-sm font-medium text-ink">Upload / Drop Image</p>
                         <p class="text-xs text-ink-muted">Klik atau seret gambar ke sini (JPG atau PNG)</p>
                     </div>
-                    <img data-image-preview alt="Preview gambar artikel" src="{{ $isEdit && $article->image ? asset('storage/' . $article->image) : '' }}" class="{{ $isEdit && $article->image ? '' : 'hidden' }} h-full max-h-64 w-full object-contain p-2">
+                    <div class="absolute inset-0 flex items-center justify-center p-2">
+                        <img data-image-preview alt="Preview gambar artikel" src="{{ $isEdit && $article->image ? asset('storage/' . $article->image) : '' }}" class="{{ $isEdit && $article->image ? '' : 'hidden' }} size-full object-contain">
+                    </div>
                     <span data-image-name class="absolute bottom-2 left-2 right-2 {{ $isEdit && $article->image ? '' : 'hidden' }} truncate rounded-md bg-black/65 px-3 py-1.5 text-xs text-white">{{ $isEdit && $article->image ? basename($article->image) : '' }}</span>
                 </label>
                 <input id="image" name="image" type="file" accept="image/*" class="sr-only">

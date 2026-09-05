@@ -17,10 +17,17 @@
             @csrf
 
             <x-input
+
                 name="username"
                 placeholder="Username"
                 aria-label="Username"
                 autocomplete="username"
+
+                name="email"
+                placeholder="Email"
+                aria-label="Email"
+                autocomplete="email"
+
                 autofocus
                 class="rounded-full bg-surface"
             />

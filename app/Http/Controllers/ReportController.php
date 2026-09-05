@@ -184,55 +184,40 @@ public function updateStatus(Request $request, $id)
 }
 
     public function adminDashboard()
-    {
-        // 1. Hitung Statistik dari Database
-        $stats = [
-            'total'       => Report::count(),
-            'verified'    => Report::whereIn('status', ['terverifikasi', 'terverifikasi_in_progress', 'resolved'])->count(),
-            'in_progress' => Report::where('status', 'terverifikasi_in_progress')->count(),
-            'done'        => Report::where('status', 'resolved')->count(),
+{
+    $stats = [
+        'total'       => Report::count(),
+        'verified'    => Report::whereIn('status', ['terverifikasi', 'terverifikasi_in_progress', 'resolved'])->count(),
+        'in_progress' => Report::where('status', 'terverifikasi_in_progress')->count(),
+        'done'        => Report::where('status', 'resolved')->count(),
+    ];
+
+    $reports = Report::latest()->get()->map(function ($report) {
+        $statusLabel = match ($report->status) {
+            'terverifikasi'             => 'Terverifikasi',
+            'terverifikasi_in_progress' => 'Proses Penanganan',
+            'resolved'                  => 'Selesai',
+            'rejected'                  => 'Ditolak',
+            default                     => 'Belum Diverifikasi',
+        };
+
+        $mapsUrl = null;
+        if ($report->latitude && $report->longitude) {
+            $mapsUrl = "https://www.google.com/maps?q={$report->latitude},{$report->longitude}";
+        }
+
+        return [
+            'id'          => $report->id,
+            'title'       => $report->title,
+            'reporter'    => $report->reporter,
+            'description' => $report->description,
+            'location'    => $report->location,
+            'maps_url'    => $mapsUrl,
+            'priority'    => $report->priority_level, // <--- Cukup panggil accessor ini
+            'status'      => $statusLabel,
         ];
+    });
 
-        // 2. Ambil & Format Data Laporan
-        $reports = Report::latest()->get()->map(function ($report) {
-            // Tentukan prioritas berdasarkan score/severity
-            $priority = 'rendah';
-            if ($report->priority_score >= 80 || strtolower($report->severity) === 'tinggi') {
-                $priority = 'tinggi';
-            } elseif ($report->priority_score >= 50 || strtolower($report->severity) === 'sedang') {
-                $priority = 'menengah';
-            }
-
-            // Label Status Human-Readable
-            $statusLabel = match ($report->status) {
-                'terverifikasi'             => 'Terverifikasi',
-                'terverifikasi_in_progress' => 'Proses Penanganan',
-                'resolved'                  => 'Selesai',
-                'rejected'                  => 'Ditolak',
-                default                     => 'Belum Diverifikasi',
-            };
-
-            // Link Google Maps dari Latitude & Longitude
-            $mapsUrl = null;
-            if ($report->latitude && $report->longitude) {
-                $mapsUrl = "https://www.google.com/maps?q={$report->latitude},{$report->longitude}";
-            }
-
-            return [
-           
-                'id'       => $report->id,
-                'title'    => $report->title,
-                'reporter' => $report->reporter,
-                'description' => $report->description,
-                'location' => $report->location,
-                'maps_url' => $mapsUrl,
-                'priority' => $priority,
-                'status'   => $statusLabel,
-            ];
-        });
-
-        
-        // 3. Kirim Data ke View Blade
-        return view('admin.reports', compact('stats', 'reports'));
-    }
+    return view('admin.reports', compact('stats', 'reports'));
+}
 }

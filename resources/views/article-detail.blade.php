@@ -15,11 +15,13 @@
         </header>
 
         @if ($artikel->image)
-            <img
-                src="{{ asset('storage/' . $artikel->image) }}"
-                alt="{{ $artikel->title }}"
-                class="mt-8 max-h-[32rem] w-full rounded-card object-cover"
-            >
+            <div class="mt-8 aspect-video w-full overflow-hidden rounded-card bg-transparent">
+                <img
+                    src="{{ asset('storage/' . $artikel->image) }}"
+                    alt="{{ $artikel->title }}"
+                    class="size-full object-contain"
+                >
+            </div>
         @endif
 
         <div class="prose prose-slate mt-8 max-w-none text-ink [&_a]:text-brand-600 [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-brand-400 [&_blockquote]:pl-4 [&_li]:ml-5 [&_ol]:list-decimal [&_p]:my-4 [&_strong]:font-semibold [&_ul]:list-disc">

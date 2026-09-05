@@ -95,6 +95,20 @@ class Report extends Model
         $this->save();
     }
 
+    // Accessor untuk mendapatkan string level prioritas ('tinggi', 'menengah', 'rendah')
+public function getPriorityLevelAttribute(): string
+{
+    if ($this->priority_score >= 80 || strtolower($this->severity ?? '') === 'tinggi') {
+        return 'tinggi';
+    }
+
+    if ($this->priority_score >= 50 || strtolower($this->severity ?? '') === 'sedang') {
+        return 'menengah';
+    }
+
+    return 'rendah';
+}
+
     /**
      * Accessor untuk mendapatkan nama pelapor yang ter-sensor dinamis berdasarkan huruf depan nama.
      * Dipanggil di Blade dengan: $report->formatted_reporter
