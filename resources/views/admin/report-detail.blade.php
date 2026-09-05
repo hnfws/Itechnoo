@@ -29,7 +29,6 @@
                 <span class="inline-flex items-center gap-1 rounded-full border border-line bg-surface-muted px-4 py-2 text-sm">
                     <span class="text-ink-muted">Skala Prioritas :</span>
 
-                    <x-admin.priority :level="$report->priority_score ?? 'rendah'" />
 
                     <x-admin.priority :level="$report->priority_level" />
 

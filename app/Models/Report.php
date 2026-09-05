@@ -96,14 +96,17 @@ class Report extends Model
     }
 
     // Accessor untuk mendapatkan string level prioritas ('tinggi', 'menengah', 'rendah')
+// File: App\Models\Report.php
+
 public function getPriorityLevelAttribute(): string
 {
-    if ($this->priority_score >= 80 || strtolower($this->severity ?? '') === 'tinggi') {
+    // Opsi jika ingin 36 masuk kategori Menengah:
+    if ($this->priority_score >= 70 || strtolower($this->severity ?? '') === 'tinggi') {
         return 'tinggi';
     }
 
-    if ($this->priority_score >= 50 || strtolower($this->severity ?? '') === 'sedang') {
-        return 'menengah';
+    if ($this->priority_score >= 35 || strtolower($this->severity ?? '') === 'sedang') {
+        return 'menengah'; // Nilai 36 akan masuk ke sini
     }
 
     return 'rendah';

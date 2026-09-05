@@ -95,8 +95,26 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     <p class="text-lg font-semibold text-ink">Welcome, {{ $adminName }}!</p>
 
     {{-- Peta --}}
-    <div class="mt-6 grid min-h-60 place-items-center rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm">
-        Map
+    <div id="admin-windy-wrapper" class="relative mt-6 grid min-h-60 overflow-hidden rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm">
+        <div id="windy" class="absolute inset-0"></div>
+        <aside class="admin-windy-legend" aria-label="Keterangan warna peta cuaca">
+            <p class="text-xs font-semibold">Kecepatan angin</p>
+            <p class="mt-0.5 text-[10px] text-white/75">Semakin terang, semakin kencang</p>
+            <div class="mt-2 h-2 rounded-full" style="background: linear-gradient(to right, #6271b8, #4a94aa, #4ca44c, #a28740, #8d3f5c, #5f64a0);"></div>
+            <div class="mt-1 flex justify-between text-[10px] text-white/80">
+                <span>0 kt</span>
+                <span>60 kt+</span>
+            </div>
+            <div class="admin-weather-key-divider"></div>
+            <p class="text-xs font-semibold">Keterangan cuaca</p>
+            <div class="admin-weather-key-list">
+                <span><i class="admin-weather-key-dot bg-violet-500"></i>Badai / petir</span>
+                <span><i class="admin-weather-key-dot bg-red-500"></i>Hujan lebat</span>
+                <span><i class="admin-weather-key-dot bg-blue-500"></i>Hujan</span>
+                <span><i class="admin-weather-key-dot bg-slate-400"></i>Berawan</span>
+                <span><i class="admin-weather-key-dot bg-yellow-400"></i>Cerah</span>
+            </div>
+        </aside>
     </div>
 
     {{-- Kolom kiri (statistik + grafik) + kolom kanan (AI Summary) --}}
@@ -146,4 +164,108 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
         <x-admin.stat label="Laporan Dalam Pengerjaan" :value="$stats['in_progress']" class="min-h-32" />
         <x-admin.stat label="Laporan Selesai" :value="$stats['done']" class="min-h-32" />
     </div>
+@push('styles')
+<style>
+    #admin-windy-wrapper .leaflet-marker-pane { z-index: 1000 !important; }
+    #admin-windy-wrapper .leaflet-popup-pane { z-index: 1100 !important; }
+    #admin-windy-wrapper .leaflet-admin-road-reference-pane-pane { z-index: 450 !important; }
+    #admin-windy-wrapper #playpause,
+    #admin-windy-wrapper #playpause-mobile { display: none !important; }
+    .admin-windy-legend {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2000;
+        width: 9rem;
+        border-radius: 0.5rem;
+        background: rgba(0, 0, 0, 0.65);
+        padding: 0.75rem;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(8px);
+    }
+    .admin-weather-key-divider { height: 1px; margin: 10px 0; background: rgba(255, 255, 255, 0.25); }
+    .admin-weather-key-list { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; font-size: 10px; line-height: 1; }
+    .admin-weather-key-list span { display: inline-flex; align-items: center; gap: 6px; }
+    .admin-weather-key-dot { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 9999px; }
+    .admin-report-marker { background: transparent !important; border: none !important; }
+    .admin-report-location-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border: 2px solid #fff;
+        border-radius: 9999px;
+        background: #dc2626;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+<script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const reports = @json($reports);
+    const options = {
+        key: @json(config('services.windy.key')),
+        lat: -7.9666204,
+        lon: 112.6326321,
+        zoom: 7,
+        graticule: false,
+        overlay: 'wind',
+        product: 'gfs',
+        menu: true,
+        message: true,
+    };
+
+    windyInit(options, windyAPI => {
+        const { map } = windyAPI;
+        map.createPane('admin-road-reference-pane');
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'admin-road-reference-pane',
+            maxZoom: 19,
+            maxNativeZoom: 18,
+            opacity: 0.9,
+            attribution: '&copy; Esri World Transportation'
+        }).addTo(map);
+
+        setTimeout(() => document.querySelector('#windy #playpause, #windy #playpause-mobile')?.click(), 500);
+
+        const markers = reports.reduce((items, report) => {
+            const lat = parseFloat(report.latitude);
+            const lng = parseFloat(report.longitude);
+            if (Number.isNaN(lat) || Number.isNaN(lng)) return items;
+
+            const escapeHtml = value => String(value || '').replace(/[&<>"']/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[character]));
+            const title = escapeHtml(report.title || 'Laporan');
+            const location = escapeHtml(report.location || 'Lokasi laporan');
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'admin-report-marker',
+                    html: `<span class="admin-report-location-tag">📍 ${title}</span>`,
+                    iconSize: [120, 30],
+                    iconAnchor: [60, 15],
+                })
+            }).addTo(map).bindPopup(`<strong>${title}</strong><br><span>${location}</span>`);
+            items.push(marker);
+            return items;
+        }, []);
+
+        if (markers.length > 0) {
+            map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+        }
+    });
+});
+</script>
+@endpush
+
 </x-layouts.admin>

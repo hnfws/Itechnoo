@@ -11,16 +11,17 @@ class AdminController extends Controller
 {
     public function index()
     {
-        // 1. Data statistik
-        $stats = [
-            'total'       => Report::count(),
-            'high'        => Report::where('priority_score', '>=', 8)->count(),
-            'medium'      => Report::whereBetween('priority_score', [4, 7.9])->count(),
-            'low'         => Report::where('priority_score', '<', 4)->count(),
-            'verified'    => Report::where('status', 'verified')->count(),
-            'in_progress' => Report::where('status', 'in_progress')->count(),
-            'done'        => Report::where('status', 'resolved')->count(),
-        ];
+
+$stats = [
+    'total'  => Report::count(),
+    'high'   => Report::where('priority_score', '>=', 70)->count(),
+    'medium' => Report::whereBetween('priority_score', [35, 69.99])->count(),
+    'low'    => Report::where('priority_score', '<', 35)->count(),
+    // Status Laporan
+    'verified'    => Report::where('status', 'terverifikasi')->count(),
+    'in_progress' => Report::where('status', 'terverifikasi_in_progress')->count(),
+    'done'        => Report::where('status', 'resolved')->count(),
+];
 
         // 2. Data laporan agar Blade tidak error
         $reports = Report::latest()->get();
