@@ -73,8 +73,6 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
 </html>
 --}}
 
-
-
 @php
     // Data fallback jika variabel dari controller tidak terdefinisi
     $adminName ??= 'Administrator';
@@ -89,6 +87,13 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     ];
     $aiSummary ??= 'Belum ada ringkasan AI untuk hari ini.';
     $aiSummaryTime ??= '08:00 WIB';
+    $chartData ??= [
+        'unverified'  => array_fill(1, 12, 0),
+        'verified'    => array_fill(1, 12, 0),
+        'in_progress' => array_fill(1, 12, 0),
+        'resolved'    => array_fill(1, 12, 0),
+        'rejected'    => array_fill(1, 12, 0),
+    ];
 @endphp
 
 <x-layouts.admin title="Dashboard">
@@ -127,12 +132,22 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
                 <x-admin.stat label="Laporan Prioritas Menengah" :value="$stats['medium']" accent="medium" class="min-h-40" />
             </div>
 
-            <div class="grid min-h-56 place-items-center rounded-card border border-line bg-surface text-sm font-medium text-ink-muted">
-                Grafik rata rata laporan
+            {{-- 🟢 BAGIAN GRAFIK YANG DIUBAH 🟢 --}}
+            <div class="rounded-card border border-line bg-surface p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h3 class="font-bold text-ink text-sm">Grafik Rata-rata Laporan</h3>
+                        <p class="text-[11px] text-ink-muted">Rekapitulasi status laporan per bulan</p>
+                    </div>
+                </div>
+                <div class="relative h-60 w-full">
+                    <canvas id="reportsChart"></canvas>
+                </div>
             </div>
+            {{-- 🔴 AKHIR BAGIAN GRAFIK YANG DIUBAH 🔴 --}}
         </div>
 
-        {{-- Widget AI Summary (Mengisi slot kotak kanan tanpa merusak desain) --}}
+        {{-- Widget AI Summary --}}
         <div class="flex flex-col justify-between rounded-card border border-line bg-surface p-6 text-sm font-medium text-ink shadow-sm min-h-72">
             <div>
                 <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
@@ -164,6 +179,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
         <x-admin.stat label="Laporan Dalam Pengerjaan" :value="$stats['in_progress']" class="min-h-32" />
         <x-admin.stat label="Laporan Selesai" :value="$stats['done']" class="min-h-32" />
     </div>
+
 @push('styles')
 <style>
     #admin-windy-wrapper .leaflet-marker-pane { z-index: 1000 !important; }
@@ -210,8 +226,132 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
 <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // -------------------------------------------------------------
+    // 🟢 BAGIAN GRAFIK CHART.JS YANG DIUBAH 🟢
+    // -------------------------------------------------------------
+    const canvas = document.getElementById('reportsChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const rawData = @json($chartData);
+
+        const createGradient = (colorStart, colorEnd) => {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+            gradient.addColorStop(0, colorStart);
+            gradient.addColorStop(1, colorEnd);
+            return gradient;
+        };
+
+        const months = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Belum Diverifikasi',
+                        data: Object.values(rawData.unverified || {}),
+                        borderColor: '#eab308',
+                        backgroundColor: createGradient('rgba(234, 179, 8, 0.2)', 'rgba(234, 179, 8, 0.0)'),
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                    },
+                    {
+                        label: 'Terverifikasi',
+                        data: Object.values(rawData.verified || {}),
+                        borderColor: '#f97316',
+                        backgroundColor: createGradient('rgba(249, 115, 22, 0.25)', 'rgba(249, 115, 22, 0.0)'),
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                    },
+                    {
+                        label: 'Dalam Perbaikan',
+                        data: Object.values(rawData.in_progress || {}),
+                        borderColor: '#06b6d4',
+                        backgroundColor: createGradient('rgba(6, 182, 212, 0.25)', 'rgba(6, 182, 212, 0.0)'),
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                    },
+                    {
+                        label: 'Selesai',
+                        data: Object.values(rawData.resolved || {}),
+                        borderColor: '#3b82f6',
+                        backgroundColor: createGradient('rgba(59, 130, 246, 0.35)', 'rgba(59, 130, 246, 0.0)'),
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: Object.values(rawData.rejected || {}),
+                        borderColor: '#ef4444',
+                        backgroundColor: createGradient('rgba(239, 68, 68, 0.2)', 'rgba(239, 68, 68, 0.0)'),
+                        fill: true,
+                        tension: 0.45,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 5,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            boxWidth: 8,
+                            usePointStyle: true,
+                            font: { size: 10 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#0f172a',
+                        titleFont: { size: 11, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        padding: 8,
+                        cornerRadius: 6,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, color: '#94a3b8' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                        ticks: { font: { size: 10 }, color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // MAP WINDY SCRIPT (TETAP SAMA SEPERTI ASLI)
+    // -------------------------------------------------------------
     const reports = @json($reports);
     const options = {
         key: @json(config('services.windy.key')),

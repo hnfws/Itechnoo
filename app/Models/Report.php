@@ -76,41 +76,41 @@ class Report extends Model
      * Hitung ulang skor prioritas:
      * (Bobot Severity AI * 60%) + (Upvote Score * 40%)
      */
+/**
+     * Hitung nilai akhir priority_score (Max 60)
+     */
     public function recalculatePriorityScore(): void
     {
+        // 1. Bobot Severity (Max 36 Poin)
         $severityScore = match (strtolower($this->severity ?? 'rendah')) {
-            'critical', 'tinggi', 'high' => 100,
-            'medium', 'sedang'           => 60,
-            default                      => 30,
+            'critical', 'tinggi', 'high' => 36,
+            'medium', 'sedang'           => 21.6,
+            default                      => 10.8,
         };
 
-        $severityWeight = $severityScore * 0.60;
-        
-        // Hitung total vote langsung dari relasi report_upvotes
+        // 2. Bobot Upvote (Max 24 Poin)
         $upvoteCount = $this->upvotes()->count();
-        $upvoteScore = min($upvoteCount * 5, 100); // Max 100 poin
-        $upvoteWeight = $upvoteScore * 0.40;
+        $upvoteScore = min($upvoteCount * 2.4, 24); 
 
-        $this->priority_score = round($severityWeight + $upvoteWeight, 2);
+        // 3. Final Score (Max 60)
+        $this->priority_score = min(round($severityScore + $upvoteScore, 2), 60);
         $this->save();
+    }
+
+    /**
+     * Level prioritas MURNI dari priority_score
+     */
+    public function getPriorityLevelAttribute(): string
+    {
+        if ($this->priority_score >= 40) return 'tinggi';   // Skor 40 - 60
+        if ($this->priority_score >= 20) return 'menengah'; // Skor 20 - 39.99
+        return 'rendah';                                    // Skor < 20
     }
 
     // Accessor untuk mendapatkan string level prioritas ('tinggi', 'menengah', 'rendah')
 // File: App\Models\Report.php
 
-public function getPriorityLevelAttribute(): string
-{
-    // Opsi jika ingin 36 masuk kategori Menengah:
-    if ($this->priority_score >= 70 || strtolower($this->severity ?? '') === 'tinggi') {
-        return 'tinggi';
-    }
 
-    if ($this->priority_score >= 35 || strtolower($this->severity ?? '') === 'sedang') {
-        return 'menengah'; // Nilai 36 akan masuk ke sini
-    }
-
-    return 'rendah';
-}
 
     /**
      * Accessor untuk mendapatkan nama pelapor yang ter-sensor dinamis berdasarkan huruf depan nama.

@@ -41,6 +41,7 @@
     .leaflet-marker-pane { z-index: 1000 !important; }
     .leaflet-popup-pane { z-index: 1100 !important; }
     #windy .leaflet-road-reference-pane-pane { z-index: 450 !important; }
+    #windy .leaflet-street-pane-pane { z-index: 500 !important; }
     .leaflet-top, .leaflet-bottom { z-index: 20 !important; }
     #windy .windy-logo { display: none !important; }
     #windy #playpause,
@@ -145,6 +146,24 @@
                 opacity: 0.9,
                 attribution: '&copy; Esri World Transportation'
             }).addTo(map);
+
+            // Saat zoom dekat, tampilkan peta jalan Leaflet di atas layer Windy.
+            map.createPane('street-pane');
+            const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                pane: 'street-pane',
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors',
+                opacity: 0,
+            }).addTo(map);
+
+            const closeZoom = 10;
+            const updateMapMode = () => {
+                const isStreetMode = map.getZoom() >= closeZoom;
+                streetMap.setOpacity(isStreetMode ? 1 : 0);
+                document.querySelector('.report-weather-legend')?.classList.toggle('street-mode', isStreetMode);
+            };
+            map.on('zoomend', updateMapMode);
+            updateMapMode();
 
             // Mulai animasi waktu secara otomatis; tombol kontrolnya disembunyikan lewat CSS.
             setTimeout(() => {
