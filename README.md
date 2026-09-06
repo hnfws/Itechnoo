@@ -127,7 +127,7 @@ Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat deng
 
   <p><em>Welcome Page Admin</em></p>
 
-  <img src="docs/screenshots/admin-dashboard.png" alt="Dashboard admin" width="800"/>
+  <img src="docs/screenshots/admin-dashboard.jpeg" alt="Dashboard admin" width="800"/>
 
   <p><em>Dashboard Admin - Monitoring dan pengelolaan laporan</em></p>
 
