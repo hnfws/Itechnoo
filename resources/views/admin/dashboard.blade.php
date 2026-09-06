@@ -100,7 +100,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     <p class="text-lg font-semibold text-ink">Welcome, {{ $adminName }}!</p>
 
     {{-- Peta --}}
-    <div id="admin-windy-wrapper" class="relative mt-6 grid min-h-60 overflow-hidden rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm">
+    <div id="admin-windy-wrapper" class="relative mt-6 grid min-h-72 sm:min-h-80 overflow-hidden rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm">
         <div id="windy" class="absolute inset-0"></div>
         <aside class="admin-windy-legend" aria-label="Keterangan warna peta cuaca">
             <p class="text-xs font-semibold">Kecepatan angin</p>

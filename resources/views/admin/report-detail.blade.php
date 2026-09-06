@@ -110,6 +110,16 @@
                             <span class="font-medium text-ink">{{ $report->reporter ?? $report->reporter_key ?? '—' }}</span>
                         </div>
                         <div>
+                            <span class="text-ink-muted">No. Telepon/WhatsApp :</span>
+                            @if ($report->phone)
+                                <a href="tel:{{ $report->phone }}" class="font-medium text-brand-600 hover:underline">
+                                    {{ $report->phone }}
+                                </a>
+                            @else
+                                <span class="font-medium text-ink">—</span>
+                            @endif
+                        </div>
+                        <div>
                             <span class="text-ink-muted">Lokasi :</span>
                             <span class="font-medium text-ink">{{ $report->location }}</span>
                         </div>
