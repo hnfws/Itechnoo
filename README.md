@@ -48,17 +48,31 @@ Lengkapi data berikut sesuai anggota tim proyek.
 
 ### Latar Belakang
 
-Informasi mengenai kerusakan jalan dan masalah infrastruktur sering kali tersebar di berbagai kanal, sulit diverifikasi, dan tidak memiliki prioritas penanganan yang jelas. Warga membutuhkan cara yang sederhana untuk mengirim laporan, sedangkan admin atau pemerintah membutuhkan data yang terstruktur untuk memantau, memverifikasi, dan menentukan laporan yang perlu ditangani lebih dahulu.
+### Latar Belakang
+
+Kerusakan jalan seperti lubang, retakan, dan kerusakan permukaan dapat mengganggu mobilitas masyarakat serta meningkatkan risiko kecelakaan. Namun, proses pelaporan dan penanganan kerusakan jalan masih menghadapi tantangan, terutama dalam mengumpulkan laporan masyarakat, memverifikasi kondisi kerusakan, serta menentukan laporan yang perlu ditangani terlebih dahulu.
+
+Banyaknya laporan dari masyarakat juga dapat menyebabkan pengelola kesulitan menentukan prioritas perbaikan apabila setiap laporan hanya dipandang sebagai pengaduan secara terpisah. Padahal, tingkat keparahan kerusakan, urgensi, lokasi, kondisi lingkungan, serta jumlah masyarakat yang terdampak dapat menjadi pertimbangan dalam menentukan prioritas penanganan.
+
+Oleh karena itu, dibutuhkan sebuah sistem yang tidak hanya menjadi media pelaporan kerusakan jalan, tetapi juga mampu mengolah laporan masyarakat menjadi informasi yang membantu pengelola menentukan prioritas perbaikan secara lebih terstruktur.
 
 ### Solusi yang Ditawarkan
 
-Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat dengan pengelola laporan melalui satu portal. Warga dapat membuat laporan lengkap dengan foto, lokasi, deskripsi, dan koordinat. Sistem kemudian membantu menganalisis tingkat keparahan serta urgensi laporan menggunakan AI, menghitung skor prioritas berdasarkan kondisi laporan dan dukungan warga, lalu menampilkan status penanganannya secara transparan.
+**Katstruction** merupakan platform pelaporan dan pemantauan kerusakan jalan berbasis Artificial Intelligence (AI) yang menghubungkan masyarakat dengan pengelola infrastruktur jalan.
+
+Masyarakat dapat melaporkan kerusakan jalan dengan mengunggah foto, memberikan deskripsi, serta menentukan lokasi kerusakan. Data tersebut kemudian dianalisis oleh AI untuk membantu mengidentifikasi kondisi kerusakan dan menentukan tingkat **severity**, **urgency**, serta **priority score** pada setiap laporan.
+
+Katstruction juga menyediakan fitur **vote** yang memungkinkan masyarakat lain memberikan dukungan terhadap laporan yang mereka anggap penting. Jumlah dukungan tersebut dapat menjadi salah satu faktor tambahan dalam menentukan prioritas penanganan.
+
+Selain itu, informasi koordinat lokasi laporan dapat digunakan untuk menampilkan persebaran kerusakan jalan pada peta serta mengambil informasi kondisi cuaca di sekitar lokasi. Kondisi tersebut dapat digunakan sebagai konteks tambahan dalam menilai risiko, misalnya ketika kerusakan jalan berada di wilayah yang sedang mengalami hujan.
+
+Dengan demikian, Katstruction tidak hanya berfungsi sebagai platform pengaduan kerusakan jalan, tetapi sebagai **sistem pendukung pengambilan keputusan** yang memanfaatkan AI, data lokasi, dan partisipasi masyarakat untuk membantu pengelola menentukan kerusakan jalan yang perlu diprioritaskan terlebih dahulu.
 
 ### Tujuan Proyek
 
-- **Tujuan Utama**: Memudahkan pelaporan masalah infrastruktur dan membantu admin menentukan prioritas penanganan.
-- **Target Pengguna**: Warga, admin pengelola laporan, dan instansi yang menangani infrastruktur publik.
-- **Value Proposition**: Pelaporan terstruktur, analisis AI, peta lokasi, dukungan warga, dan pemantauan status dalam satu aplikasi.
+**Tujuan Utama**: Memudahkan masyarakat melaporkan kerusakan jalan serta membantu pengelola menentukan prioritas penanganan berdasarkan tingkat keparahan, urgensi, risiko, dan dukungan masyarakat.
+**Target Pengguna**: Masyarakat sebagai pelapor dan pengelola/instansi yang bertanggung jawab terhadap infrastruktur jalan.
+**Value Proposition**: Pelaporan kerusakan jalan yang terstruktur, analisis berbasis AI, pemetaan lokasi, dukungan masyarakat, dan pemantauan status penanganan dalam satu platform.
 
 ---
 
@@ -66,18 +80,25 @@ Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat deng
 
 ### Fitur Utama
 
+
+## Fitur Unggulan
+
+### Fitur Utama
+
 | Fitur | Deskripsi | Keunggulan |
 |----------|--------------|---------------|
-| **Pelaporan Infrastruktur** | Warga mengirim judul, identitas, kontak, deskripsi, foto, lokasi, dan koordinat laporan. | Data laporan lebih lengkap dan mudah ditindaklanjuti. |
-| **Analisis AI** | Gemini menganalisis foto dan deskripsi untuk menghasilkan tingkat keparahan, urgensi, risiko, serta ringkasan untuk warga dan admin. | Membantu klasifikasi laporan secara cepat dan konsisten. |
-| **Skor Prioritas** | Sistem menghitung prioritas dari severity, urgency, dan jumlah dukungan warga. | Admin dapat melihat laporan yang membutuhkan perhatian lebih dahulu. |
-| **Dukungan Warga** | Warga dapat melakukan upvote dan unvote pada laporan tanpa login menggunakan identitas cookie browser. | Dukungan publik dapat dihitung tanpa proses registrasi yang rumit. |
-| **Panel Admin** | Admin dapat login, melihat dashboard, mengubah status, mengelola artikel, dan menghapus laporan. | Pengelolaan laporan terpusat dan lebih terkontrol. |
+| **Pelaporan Kerusakan Jalan** | Masyarakat mengirimkan deskripsi, foto, lokasi, dan koordinat kerusakan jalan tanpa perlu login. | Data kerusakan lebih lengkap dan mudah dianalisis serta ditindaklanjuti. |
+| **Analisis AI** | AI menganalisis foto dan deskripsi untuk menghasilkan tingkat keparahan (*severity*), urgensi (*urgency*), potensi risiko (*potential risk*), dan ringkasan laporan. | Membantu pengelola memahami kondisi kerusakan secara cepat dan terstruktur. |
+| **Skor Prioritas** | Sistem menghitung *priority score* berdasarkan tingkat keparahan, urgensi, risiko, dan dukungan masyarakat. | Membantu pengelola menentukan laporan yang membutuhkan penanganan lebih dahulu. |
+| **Dukungan Masyarakat** | Masyarakat dapat melakukan *upvote* dan *unvote* pada laporan tanpa login menggunakan identitas anonim berbasis browser. | Menunjukkan tingkat perhatian masyarakat terhadap suatu kerusakan tanpa proses registrasi. |
+| **Pemetaan Lokasi** | Laporan ditampilkan berdasarkan koordinat lokasi kerusakan pada peta. | Membantu pengelola melihat persebaran dan lokasi kerusakan jalan secara lebih jelas. |
+| **Informasi Cuaca** | Sistem mengambil informasi cuaca berdasarkan koordinat lokasi laporan untuk memberikan konteks tambahan terhadap risiko kerusakan. | Membantu memberikan peringatan tambahan, seperti risiko jalan berlubang saat hujan. |
+| **Panel Admin** | Admin dapat login, melihat dashboard dan prioritas laporan, mengubah status penanganan, mengelola artikel, serta menghapus laporan. | Pengelolaan laporan menjadi lebih terpusat dan terkontrol. |
 
 ### Fitur Tambahan
 
 - **Peta Interaktif** - Menampilkan lokasi laporan menggunakan Leaflet dan OpenStreetMap.
-- **Peringatan Cuaca Ekstrem** - Mengecek kondisi cuaca berdasarkan koordinat atau lokasi laporan.
+- **Cek cuaca disekitar laporan** - Mengecek kondisi cuaca berdasarkan koordinat atau lokasi laporan.
 - **Status Penanganan** - Mendukung status pending, terverifikasi, dalam proses, selesai, dan ditolak.
 - **Artikel Publik** - Admin dapat menerbitkan artikel informasi untuk warga.
 - **Privasi Pelapor** - Nama pelapor dapat ditampilkan atau disamarkan berdasarkan pilihan saat membuat laporan.
@@ -89,7 +110,9 @@ Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat deng
 
 ### Live Demo
 
-**[Kunjungi Website](http://ptrs.site.je/)**
+**[Kunjungi Website]**
+- **masyarakat = http://ptrs.site.je/**
+- **admin = http://ptrs.site.je/admin/**
 
 ### Screenshot Aplikasi
 
@@ -503,10 +526,10 @@ Proyek ini menggunakan route web Laravel dan belum menyediakan prefix REST `/api
 ### Base URL
 
 ```text
-Development: http://localhost:8000
-Production:  http://ptrs.site.je/
-Masyarakat : http://ptrs.site.je/
-Admin     : http://ptrs.site.je/admin/
+Development(masyarakat): http://localhost:8000
+Development(admin): http://localhost:8000
+Production(masyarakat):  http://ptrs.site.je/
+Production(admin) : http://ptrs.site.je/admin/
 ```
 
 ### Route Publik
