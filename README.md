@@ -386,6 +386,7 @@ Atau pada macOS/Linux:
 cp .env.example .env
 php artisan key:generate
 ```
+API Key yang dapat digunakan: **[Link Drive API Key](https://drive.google.com/drive/folders/1Hl-Nyr0qRRZMLZmuqdUZHgHUWGqqCJAx?usp=sharing)**
 
 Contoh konfigurasi SQLite:
 
