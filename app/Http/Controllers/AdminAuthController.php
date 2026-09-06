@@ -21,8 +21,7 @@ public function login(Request $request)
     if (Auth::guard('admin')->attempt($credentials)) {
         $request->session()->regenerate();
 
-        // Ganti '/dashboard' menjadi route name 'admin.dashboard' atau '/admin/dashboard'
-        return redirect()->intended(route('admin.dashboard'));
+        return redirect()->route('admin.welcome');
     }
 
     return back()->withErrors([

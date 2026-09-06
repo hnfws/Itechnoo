@@ -96,7 +96,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     ];
 @endphp
 
-<x-layouts.admin title="Dashboard">
+<x-layouts.admin title="Dashboard Admin">
     <p class="text-lg font-semibold text-ink">Welcome, {{ $adminName }}!</p>
 
     {{-- Peta --}}
