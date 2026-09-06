@@ -505,6 +505,8 @@ Proyek ini menggunakan route web Laravel dan belum menyediakan prefix REST `/api
 ```text
 Development: http://localhost:8000
 Production:  http://ptrs.site.je/
+Masyarakat : http://ptrs.site.je/
+Admin     : http://ptrs.site.je/admin/
 ```
 
 ### Route Publik
