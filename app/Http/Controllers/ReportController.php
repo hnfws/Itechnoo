@@ -7,6 +7,7 @@ use App\Models\ReportUpvote;
 use App\Services\GeminiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\WeatherService;
 
@@ -191,6 +192,20 @@ public function updateStatus(Request $request, $id)
 
     return back()->with('success', 'Status laporan berhasil diperbarui!');
 }
+
+    public function destroy($id)
+    {
+        $report = Report::findOrFail($id);
+
+        if ($report->image) {
+            Storage::disk('public')->delete($report->image);
+        }
+
+        $report->delete();
+
+        return redirect()->route('admin.reports')
+            ->with('success', 'Laporan berhasil dihapus!');
+    }
 
     public function adminDashboard(Request $request)
 {

@@ -92,6 +92,17 @@ class ArtikelController extends Controller
         return redirect()->route('admin.articles')->with('success', 'Artikel berhasil diperbarui!');
     }
 
+    public function destroy(Artikel $artikel)
+    {
+        if ($artikel->image) {
+            Storage::disk('public')->delete($artikel->image);
+        }
+
+        $artikel->delete();
+
+        return redirect()->route('admin.articles')->with('success', 'Artikel berhasil dihapus!');
+    }
+
     private function sanitizeContent(string $content): string
     {
         $content = strip_tags(
