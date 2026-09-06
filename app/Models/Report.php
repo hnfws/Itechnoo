@@ -93,12 +93,18 @@ class Report extends Model
             default                      => 10.8,
         };
 
-        // 2. Bobot Upvote (Max 24 Poin)
+        // 2. Bobot Urgency (Max 4.8 Poin)
+        $urgencyScore = match (strtolower(trim($this->urgency ?? 'normal'))) {
+            'mendesak', 'urgent' => 4.8,
+            default             => 0,
+        };
+
+        // 3. Bobot Upvote (Max 24 Poin)
         $upvoteCount = $this->upvotes()->count();
         $upvoteScore = min($upvoteCount * 2.4, 24); 
 
-        // 3. Final Score (Max 60)
-        $this->priority_score = min(round($severityScore + $upvoteScore, 2), 60);
+        // 4. Final Score (Max 60)
+        $this->priority_score = min(round($severityScore + $urgencyScore + $upvoteScore, 2), 60);
         $this->save();
     }
 
