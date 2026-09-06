@@ -117,6 +117,20 @@ Simpan screenshot pada folder `docs/screenshots/`, kemudian ganti nama file beri
 
   <p><em>Form Laporan - Pengiriman laporan infrastruktur oleh warga</em></p>
 
+  <img src="docs/screenshots/report-view.jpeg" alt="View laporan" width="800"/>
+
+  <p><em>Contoh Laporan infrastruktur oleh warga</em></p>
+
+  <p>Sisi Admin<p>
+
+  <img src="docs/screenshots/admin-login.png" alt="Login admin" width="800"/>
+
+  <p><em>Login Page Admin - Harus memasukkan email dan password</em></p>
+
+  <img src="docs/screenshots/admin-welcome.png" alt="Wpage admin" width="800"/>
+
+  <p><em>Welcome Page Admin</em></p>
+
   <img src="docs/screenshots/admin-dashboard.png" alt="Dashboard admin" width="800"/>
 
   <p><em>Dashboard Admin - Monitoring dan pengelolaan laporan</em></p>

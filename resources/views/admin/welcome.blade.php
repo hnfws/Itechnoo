@@ -1,6 +1,6 @@
 @php
     // Nanti backend mengganti dengan nama admin yang sedang login: auth()->user()->name
-    $adminName ??= 'Endministrator';
+    $adminName ??= 'Super Admin';
 @endphp
 
 <x-layouts.guest title="Selamat datang">
