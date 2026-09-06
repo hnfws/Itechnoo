@@ -89,6 +89,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/artikel/simpan', [ArtikelController::class, 'store'])->name('admin.articles.store');
         Route::get('/artikel/{artikel}/edit', [ArtikelController::class, 'edit'])->name('admin.articles.edit');
         Route::patch('/artikel/{artikel}', [ArtikelController::class, 'update'])->name('admin.articles.update');
+        Route::delete('/artikel/{artikel}', [ArtikelController::class, 'destroy'])->name('admin.articles.destroy');
 
         // Logout Admin
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');

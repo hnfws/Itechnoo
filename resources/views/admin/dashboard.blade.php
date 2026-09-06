@@ -185,6 +185,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     #admin-windy-wrapper .leaflet-marker-pane { z-index: 1000 !important; }
     #admin-windy-wrapper .leaflet-popup-pane { z-index: 1100 !important; }
     #admin-windy-wrapper .leaflet-admin-road-reference-pane-pane { z-index: 450 !important; }
+    #admin-windy-wrapper .leaflet-admin-street-pane-pane { z-index: 500 !important; }
     #admin-windy-wrapper #playpause,
     #admin-windy-wrapper #playpause-mobile { display: none !important; }
     .admin-windy-legend {
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
         lat: -7.9666204,
         lon: 112.6326321,
         zoom: 7,
+        maxZoom: 19,
         graticule: false,
         overlay: 'wind',
         product: 'gfs',
@@ -367,6 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     windyInit(options, windyAPI => {
         const { map } = windyAPI;
+        map.setMaxZoom(19);
         map.createPane('admin-road-reference-pane');
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
             pane: 'admin-road-reference-pane',
@@ -375,6 +378,22 @@ document.addEventListener('DOMContentLoaded', function () {
             opacity: 0.9,
             attribution: '&copy; Esri World Transportation'
         }).addTo(map);
+
+        map.createPane('admin-street-pane');
+        const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'admin-street-pane',
+            maxZoom: 19,
+            maxNativeZoom: 19,
+            opacity: 0,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const closeZoom = 10;
+        const updateMapMode = () => {
+            streetMap.setOpacity(map.getZoom() >= closeZoom ? 1 : 0);
+        };
+        map.on('zoomend', updateMapMode);
+        updateMapMode();
 
         setTimeout(() => document.querySelector('#windy #playpause, #windy #playpause-mobile')?.click(), 500);
 

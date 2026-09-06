@@ -18,7 +18,7 @@
             </div>
         @endif
 
-        <form action="{{ $formAction }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form id="article-form" action="{{ $formAction }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @if ($isEdit)
                 @method('PATCH')
@@ -85,14 +85,29 @@
                 @enderror
             </div>
 
-            <div class="flex flex-wrap justify-center gap-4">
-                <x-button href="{{ route('admin.articles') }}" variant="outline" class="min-w-36 rounded-full">
-                    Cancel
-                </x-button>
-                <x-button type="submit" class="min-w-36 rounded-full">
-                    {{ $isEdit ? 'Simpan Perubahan' : 'Submit' }}
-                </x-button>
-            </div>
         </form>
+
+        <div class="mt-8 flex flex-wrap justify-center gap-4">
+            <x-button href="{{ route('admin.articles') }}" variant="outline" class="min-w-36 rounded-full">
+                Cancel
+            </x-button>
+            <x-button type="submit" form="article-form" class="min-w-36 rounded-full">
+                {{ $isEdit ? 'Simpan Perubahan' : 'Submit' }}
+            </x-button>
+            @if ($isEdit)
+                <form
+                    action="{{ route('admin.articles.destroy', $article) }}"
+                    method="POST"
+                    class="inline-flex"
+                    onsubmit="return confirm('Yakin ingin menghapus artikel ini? Tindakan ini tidak bisa dibatalkan.')"
+                >
+                    @csrf
+                    @method('DELETE')
+                    <x-button type="submit" variant="danger" class="min-w-36 rounded-full">
+                        Hapus Artikel
+                    </x-button>
+                </form>
+            @endif
+        </div>
     </div>
 </x-layouts.admin>

@@ -127,6 +127,7 @@
             lat: -7.9666204,
             lon: 112.6326321,
             zoom: 7,
+            maxZoom: 19,
             graticule: false,
             overlay: 'wind',
             product: 'gfs',
@@ -136,6 +137,7 @@
 
         windyInit(options, windyAPI => {
             const { map, store } = windyAPI;
+            map.setMaxZoom(19);
 
             // Overlay jalan transparan agar detail jalan muncul saat peta diperbesar.
             map.createPane('road-reference-pane');
@@ -152,6 +154,7 @@
             const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 pane: 'street-pane',
                 maxZoom: 19,
+                maxNativeZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors',
                 opacity: 0,
             }).addTo(map);
