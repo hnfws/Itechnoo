@@ -383,7 +383,7 @@ Pastikan sudah terpasang:
 #### 1. Clone Repository
 
 ```bash
-git clone https://github.com/[username]/[repo-name].git
+git clone https://github.com/hnfws/Itechnoo.git
 cd itechnoo
 ```
 
