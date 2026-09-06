@@ -146,7 +146,7 @@ $report = Report::withCount('upvotes')->findOrFail($id);
         $userKey = $this->getReporterKey();
 
         if ($report->reporter_key === $userKey) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'message' => 'Kamu tidak dapat memberikan upvote pada laporan milik sendiri.',
                 ], 422);
@@ -159,26 +159,31 @@ $report = Report::withCount('upvotes')->findOrFail($id);
             ->where('voter_key', $userKey)
             ->first();
 
-        if (!$existingVote) {
+        if ($existingVote) {
+            $existingVote->delete();
+            $hasUpvoted = false;
+        } else {
             ReportUpvote::create([
                 'report_id' => $report->id,
                 'voter_key' => $userKey,
             ]);
-
-            $report->recalculatePriorityScore();
+            $hasUpvoted = true;
         }
 
-        if ($request->expectsJson()) {
+        $report->recalculatePriorityScore();
+        $report->refresh();
+
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'upvote_count' => $report->upvotes()->count(),
-                'has_upvoted' => true,
+            'upvote_count' => ReportUpvote::where('report_id', $report->id)->count(),
+                'has_upvoted' => $hasUpvoted,
                 'priority_score' => $report->priority_score,
             ]);
         }
 
-        return back()->with('success', $existingVote
-            ? 'Kamu sudah mendukung laporan ini.'
-            : 'Dukungan berhasil ditambahkan.');
+        return back()->with('success', $hasUpvoted
+            ? 'Dukungan berhasil ditambahkan.'
+            : 'Dukungan berhasil dibatalkan.');
     }
 
     /**

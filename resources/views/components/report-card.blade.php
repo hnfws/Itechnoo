@@ -17,7 +17,9 @@
         'rejected' => 'border-red-200 bg-red-50 text-red-700',
         default => 'border-amber-200 bg-amber-50 text-amber-700',
     };
-    $upvotes = is_array($report) ? ($report['upvotes'] ?? 0) : ($report->upvote_count ?? $report->upvotes()->count());
+    $upvotes = is_array($report)
+        ? ($report['upvotes'] ?? $report['upvotes_count'] ?? 0)
+        : ($report->upvotes_count ?? $report->upvote_count ?? $report->upvotes()->count());
     $lat = is_array($report) ? ($report['latitude'] ?? null) : $report->latitude;
     $lng = is_array($report) ? ($report['longitude'] ?? null) : $report->longitude;
     $voterKey = request()->cookie('guest_reporter_key');
@@ -108,13 +110,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 type="submit"
                 id="upvote-btn-{{ $id }}"
                 class="flex w-full flex-col items-center gap-0.5 rounded-lg border px-3 py-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 {{ $hasUpvoted ? 'border-brand-400 bg-brand-50 text-brand-700' : 'border-line text-ink-muted hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700' }}"
-                aria-label="{{ $hasUpvoted ? 'Sudah mendukung laporan' : 'Upvote laporan' }} {{ $title }}"
-                {{ $hasUpvoted ? 'disabled' : '' }}
+                aria-label="{{ $hasUpvoted ? 'Batalkan dukungan laporan' : 'Upvote laporan' }} {{ $title }}"
             >
             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <span id="upvote-count-{{ $id }}" class="text-sm font-semibold tabular-nums">{{ $upvotes }}</span>
+            <span id="upvote-count-{{ $id }}" data-upvote-count="{{ $id }}" class="text-sm font-semibold tabular-nums">{{ $upvotes }}</span>
             <span class="upvote-label text-[11px] font-medium">{{ $hasUpvoted ? 'Didukung' : 'Upvote' }}</span>
             </button>
         </form>
@@ -173,10 +174,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const button = form.querySelector('button');
         const label = form.querySelector('.upvote-label');
-        const count = document.getElementById('upvote-count-{{ $id }}');
+        const count = form.querySelector('[data-upvote-count]');
         const csrfToken = form.querySelector('input[name="_token"]').value;
+        const wasUpvoted = label.textContent.trim() === 'Didukung';
+        const previousCount = Number.parseInt(count.textContent, 10) || 0;
+        const nextCount = Math.max(0, previousCount + (wasUpvoted ? -1 : 1));
 
         button.disabled = true;
+        count.textContent = nextCount;
+        label.textContent = wasUpvoted ? 'Upvote' : 'Didukung';
 
         try {
             const response = await fetch(form.action, {
@@ -189,23 +195,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
             });
 
-            const responseText = await response.text();
-            let data;
-
-            try {
-                data = JSON.parse(responseText);
-            } catch (parseError) {
-                throw new Error('Server mengirim respons yang tidak valid. Coba refresh halaman.');
-            }
+            const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.message || 'Vote gagal dikirim.');
             }
 
             count.textContent = data.upvote_count;
-            label.textContent = 'Didukung';
-            button.classList.add('border-brand-400', 'bg-brand-50', 'text-brand-700');
+            label.textContent = data.has_upvoted ? 'Didukung' : 'Upvote';
+            button.setAttribute('aria-label', data.has_upvoted ? 'Batalkan dukungan laporan' : 'Upvote laporan');
+            button.classList.toggle('border-brand-400', data.has_upvoted);
+            button.classList.toggle('bg-brand-50', data.has_upvoted);
+            button.classList.toggle('text-brand-700', data.has_upvoted);
+            button.classList.toggle('border-line', !data.has_upvoted);
+            button.classList.toggle('text-ink-muted', !data.has_upvoted);
+            button.disabled = false;
         } catch (error) {
+            count.textContent = previousCount;
+            label.textContent = wasUpvoted ? 'Didukung' : 'Upvote';
             button.disabled = false;
             alert(error.message || 'Terjadi kesalahan.');
         }
