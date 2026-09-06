@@ -3,7 +3,15 @@
 <style>
   /* Menambahkan efek cursor pointer agar pengguna tahu peta/marker bisa diklik */
   #report-map {
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
     cursor: pointer;
+  }
+
+  #report-map .leaflet-top,
+  #report-map .leaflet-bottom {
+    z-index: 10;
   }
 </style>
 @endpush

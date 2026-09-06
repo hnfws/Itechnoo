@@ -6,10 +6,25 @@
     ];
 @endphp
 
-<header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
+<style>
+    .site-header {
+        position: relative;
+        z-index: 1000;
+        background: var(--color-surface);
+    }
+
+    @media (min-width: 1024px) {
+        .site-header {
+            position: sticky;
+            top: 0;
+        }
+    }
+</style>
+
+<header class="site-header border-b border-line">
     <x-container class="flex h-16 items-center justify-between gap-4">
         <a href="/" class="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
-            <span class="grid size-8 place-items-center rounded-lg bg-brand-600 text-sm font-bold text-white">L</span>
+            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="size-9 object-contain">
             <span>{{ config('app.name') }}</span>
         </a>
 
