@@ -81,14 +81,6 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <button type="button" class="relative grid size-10 place-items-center rounded-full text-ink-muted transition hover:bg-surface-muted" aria-label="Notifikasi">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M13.7 21a2 2 0 01-3.4 0" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <span class="absolute top-2 right-2 size-2 rounded-full bg-danger"></span>
-                </button>
-
                 <button type="button" class="flex items-center gap-2 rounded-full border border-line py-1 pr-3 pl-1 text-sm font-medium transition hover:bg-surface-muted">
                     <span class="grid size-7 place-items-center rounded-full bg-brand-600 text-xs font-bold text-white">A</span>
                     Profile
