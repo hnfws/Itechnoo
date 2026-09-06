@@ -1,6 +1,6 @@
 <div align="center">
 
-![Logo](images/logo.png)
+![Logo](public/images/logo.png)
 # Katstruction.
 
 ### Platform Pelaporan Infrastruktur Berbasis AI untuk Kolaborasi Warga dan Pemerintah
