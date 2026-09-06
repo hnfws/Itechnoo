@@ -17,9 +17,7 @@
         'rejected' => 'border-red-200 bg-red-50 text-red-700',
         default => 'border-amber-200 bg-amber-50 text-amber-700',
     };
-    $upvotes = is_array($report)
-        ? ($report['upvotes'] ?? $report['upvotes_count'] ?? 0)
-        : ($report->upvotes_count ?? $report->upvote_count ?? $report->upvotes()->count());
+    $upvotes = is_array($report) ? ($report['upvotes'] ?? 0) : ($report->upvotes_count ?? 0);
     $lat = is_array($report) ? ($report['latitude'] ?? null) : $report->latitude;
     $lng = is_array($report) ? ($report['longitude'] ?? null) : $report->longitude;
     $voterKey = request()->cookie('guest_reporter_key');
@@ -68,6 +66,15 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
+<style>
+    .report-card-truncate {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
 <article class="relative flex flex-col gap-4 rounded-card border border-line bg-surface p-4 transition hover:border-brand-300 hover:shadow-sm sm:flex-row sm:items-start sm:gap-5">
     
     {{-- Container Mini Peta (Tambahkan cursor-pointer & z-20 agar dapat diklik) --}}
@@ -94,13 +101,14 @@ document.addEventListener("DOMContentLoaded", function() {
             @endif
         </h3>
 
-        <p class="text-sm text-ink">
-            <span class="text-ink-muted">Lokasi :</span> {{ $location }}
+        <p class="flex min-w-0 text-sm text-ink">
+            <span class="shrink-0 text-ink-muted">Lokasi :</span>
+            <span class="report-card-truncate">&nbsp;{{ $location }}</span>
         </p>
 
         <p class="text-sm text-ink-muted">Deskripsi :</p>
 
-        <p class="text-sm leading-relaxed text-ink-muted">&ldquo;{{ $description }}&rdquo;</p>
+        <p class="report-card-truncate text-sm leading-relaxed text-ink-muted">&ldquo;{{ $description }}&rdquo;</p>
     </div>
 
     <div class="relative z-20 shrink-0 sm:w-20">

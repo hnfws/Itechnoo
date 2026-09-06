@@ -1,4 +1,49 @@
 <x-layouts.admin title="Laporan">
+    @push('styles')
+    <style>
+        .reports-desktop-table { display: none; }
+        .reports-mobile-cards { display: block; }
+
+        @media (min-width: 640px) {
+            .reports-desktop-table { display: block; }
+            .reports-mobile-cards { display: none; }
+        }
+
+        .reports-toolbar {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .reports-filters {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .reports-filters input,
+        .reports-filters summary {
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .reports-toolbar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .reports-filters {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .reports-filters input { width: 12rem; }
+            .reports-filters summary { width: auto; }
+        }
+    </style>
+    @endpush
+
     {{-- Ringkasan atas --}}
     <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <x-admin.stat label="Total Laporan" :value="$stats['total']" class="min-h-32" />
@@ -8,11 +53,11 @@
     </div>
 
     {{-- Panel daftar laporan --}}
-    <div class="mt-6 rounded-card border border-line bg-surface shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-3 p-5">
+    <div class="mt-6 overflow-visible rounded-card border border-line bg-surface shadow-sm">
+        <div class="reports-toolbar gap-3 p-5">
             <h2 class="text-base font-semibold text-ink">Laporan Terbaru</h2>
 
-            <form method="GET" action="{{ route('admin.reports') }}" class="flex flex-wrap items-center gap-2">
+            <form method="GET" action="{{ route('admin.reports') }}" class="reports-filters gap-2">
                 <label class="relative">
                     <span class="sr-only">Cari laporan</span>
                     <svg class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -50,7 +95,7 @@
             </form>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="reports-desktop-table overflow-x-auto">
             <table class="w-full min-w-[720px] text-left text-sm">
                 <thead>
                     <tr class="border-y border-line bg-surface-muted text-ink-muted">
@@ -92,6 +137,52 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <div class="reports-mobile-cards min-h-0 divide-y divide-line overflow-visible">
+            @foreach ($reports as $report)
+                <article class="space-y-3 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs text-ink-muted">Judul Laporan</p>
+                            <h3 class="break-words font-semibold text-ink">{{ $report['title'] }}</h3>
+                        </div>
+                        <a href="{{ route('admin.reports.show', $report['id']) }}" class="grid size-9 shrink-0 place-items-center rounded-lg border border-line text-ink-muted transition hover:bg-surface-muted" aria-label="Buka detail laporan {{ $report['title'] }}">
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <dl class="grid gap-2 text-sm">
+                        <div>
+                            <dt class="text-xs text-ink-muted">Nama Pelapor</dt>
+                            <dd class="break-words text-ink">{{ $report['reporter'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs text-ink-muted">Deskripsi</dt>
+                            <dd class="break-words text-ink">{{ $report['description'] }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs text-ink-muted">Lokasi</dt>
+                            <dd class="break-words">
+                                @if ($report['maps_url'])
+                                    <a href="{{ $report['maps_url'] }}" target="_blank" rel="noopener noreferrer" class="font-medium text-brand-600 underline">
+                                        {{ $report['location'] }}
+                                    </a>
+                                @else
+                                    <span class="text-ink">{{ $report['location'] }}</span>
+                                @endif
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <div class="flex flex-wrap items-center gap-2 pt-1 text-sm">
+                        <x-admin.priority :level="$report['priority']" />
+                        <span class="font-medium text-green-600">{{ $report['status'] }}</span>
+                    </div>
+                </article>
+            @endforeach
         </div>
     </div>
 </x-layouts.admin>

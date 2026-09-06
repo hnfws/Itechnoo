@@ -25,16 +25,67 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
+    <style>
+        .admin-site-header {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 10000 !important;
+            isolation: isolate;
+            background: var(--color-surface) !important;
+        }
+
+        .admin-sidebar {
+            position: fixed !important;
+            top: 4rem !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            z-index: 40 !important;
+            width: 16rem;
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 200ms ease;
+        }
+
+        #sidebar-toggle:checked ~ .admin-sidebar {
+            transform: translateX(0);
+        }
+
+        .admin-sidebar-overlay {
+            position: fixed;
+            top: 4rem;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 30;
+            display: none;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        #sidebar-toggle:checked ~ .admin-sidebar-overlay {
+            display: block;
+        }
+
+        @media (min-width: 1024px) {
+            .admin-sidebar {
+                top: 0 !important;
+                transform: translateX(0);
+            }
+
+            .admin-sidebar-overlay {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body class="min-h-dvh bg-surface-muted font-sans text-ink antialiased">
     {{-- Checkbox tersembunyi untuk buka/tutup sidebar di mobile (tanpa JavaScript) --}}
     <input type="checkbox" id="sidebar-toggle" class="peer sr-only">
 
     {{-- Lapisan gelap saat sidebar terbuka di mobile --}}
-    <label for="sidebar-toggle" class="fixed inset-0 z-30 hidden bg-black/50 peer-checked:block lg:hidden"></label>
+    <label for="sidebar-toggle" class="admin-sidebar-overlay"></label>
 
     {{-- Sidebar --}}
-    <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full border-r border-line bg-surface p-4 transition-transform peer-checked:translate-x-0 lg:translate-x-0">
+    <aside class="admin-sidebar border-r border-line bg-surface p-4">
         <div class="mb-6 flex justify-center pt-2">
             <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="size-16 object-contain">
         </div>
@@ -69,7 +120,7 @@
 
     {{-- Area utama --}}
     <div class="lg:pl-64">
-        <header class="sticky top-0 z-20 flex h-16 items-center justify-between gap-4 border-b border-line bg-surface px-4 sm:px-6">
+        <header class="admin-site-header flex h-16 items-center justify-between gap-4 border-b border-line px-4 sm:px-6">
             <div class="flex items-center gap-3">
                 <label for="sidebar-toggle" class="grid size-10 cursor-pointer place-items-center rounded-lg text-ink-muted transition hover:bg-surface-muted lg:hidden">
                     <span class="sr-only">Buka menu</span>
@@ -88,7 +139,7 @@
             </div>
         </header>
 
-        <main class="p-4 sm:p-6">
+        <main class="min-w-0 overflow-x-visible p-4 sm:p-6">
             {{ $slot }}
         </main>
     </div>

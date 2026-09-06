@@ -100,7 +100,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     <p class="text-lg font-semibold text-ink">Welcome, {{ $adminName }}!</p>
 
     {{-- Peta --}}
-    <div id="admin-windy-wrapper" class="relative mt-6 grid min-h-72 sm:min-h-80 overflow-hidden rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm">
+    <div id="admin-windy-wrapper" class="relative z-0 isolate mt-6 grid min-h-72 overflow-hidden rounded-card bg-surface text-sm font-medium text-ink-muted shadow-sm sm:min-h-80">
         <div id="windy" class="absolute inset-0"></div>
         <aside class="admin-windy-legend" aria-label="Keterangan warna peta cuaca">
             <p class="text-xs font-semibold">Kecepatan angin</p>
@@ -123,9 +123,9 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     </div>
 
     {{-- Kolom kiri (statistik + grafik) + kolom kanan (AI Summary) --}}
-    <div class="mt-6 grid gap-6 lg:grid-cols-3">
-        <div class="space-y-6 lg:col-span-2">
-            <div class="grid gap-6 sm:grid-cols-2">
+    <div class="mt-6 grid min-w-0 gap-6 lg:grid-cols-3">
+        <div class="min-w-0 space-y-6 lg:col-span-2">
+            <div class="grid min-w-0 gap-6 sm:grid-cols-2">
                 <x-admin.stat label="Total Laporan" :value="$stats['total']" class="min-h-40" />
                 <x-admin.stat label="Laporan Prioritas Tinggi" :value="$stats['high']" accent="high" class="min-h-40" />
                 <x-admin.stat label="Laporan Prioritas Rendah" :value="$stats['low']" accent="low" class="min-h-40" />
@@ -133,22 +133,22 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
             </div>
 
             {{-- 🟢 BAGIAN GRAFIK YANG DIUBAH 🟢 --}}
-            <div class="rounded-card border border-line bg-surface p-5 shadow-sm">
+            <div class="min-w-0 overflow-hidden rounded-card border border-line bg-surface p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                     <div>
                         <h3 class="font-bold text-ink text-sm">Grafik Rata-rata Laporan</h3>
                         <p class="text-[11px] text-ink-muted">Rekapitulasi status laporan per bulan</p>
                     </div>
                 </div>
-                <div class="relative h-60 w-full">
-                    <canvas id="reportsChart"></canvas>
+                <div class="relative h-60 w-full min-w-0 overflow-hidden">
+                    <canvas id="reportsChart" class="max-w-full"></canvas>
                 </div>
             </div>
             {{-- 🔴 AKHIR BAGIAN GRAFIK YANG DIUBAH 🔴 --}}
         </div>
 
         {{-- Widget AI Summary --}}
-        <div class="flex flex-col justify-between rounded-card border border-line bg-surface p-6 text-sm font-medium text-ink shadow-sm min-h-72">
+        <div class="min-w-0 overflow-hidden flex flex-col justify-between rounded-card border border-line bg-surface p-6 text-sm font-medium text-ink shadow-sm min-h-72">
             <div>
                 <div class="flex items-center justify-between border-b border-line pb-3 mb-4">
                     <div class="flex items-center gap-2">
@@ -161,7 +161,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
                 </div>
                 
                 {{-- Hasil Rangkuman AI Ditampilkan di Sini --}}
-                <div class="space-y-2 text-xs leading-relaxed text-ink-muted font-normal">
+                <div class="min-w-0 space-y-2 break-words text-xs leading-relaxed text-ink-muted font-normal [overflow-wrap:anywhere]">
                     {!! nl2br(e($aiSummary)) !!}
                 </div>
             </div>
@@ -174,7 +174,7 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
     </div>
 
     {{-- Ringkasan status di bawah --}}
-    <div class="mt-6 grid gap-6 sm:grid-cols-3">
+    <div class="mt-6 grid min-w-0 gap-6 sm:grid-cols-3">
         <x-admin.stat label="Laporan Terverifikasi" :value="$stats['verified']" class="min-h-32" />
         <x-admin.stat label="Laporan Dalam Pengerjaan" :value="$stats['in_progress']" class="min-h-32" />
         <x-admin.stat label="Laporan Selesai" :value="$stats['done']" class="min-h-32" />
@@ -182,6 +182,17 @@ Buka komentar ini nanti saat siap menghubungkan database & Gemini AI.
 
 @push('styles')
 <style>
+    #admin-windy-wrapper {
+        position: relative !important;
+        z-index: 0 !important;
+        isolation: isolate;
+    }
+
+    #admin-windy-wrapper #windy {
+        position: absolute !important;
+        z-index: 0 !important;
+    }
+
     #admin-windy-wrapper .leaflet-marker-pane { z-index: 1000 !important; }
     #admin-windy-wrapper .leaflet-popup-pane { z-index: 1100 !important; }
     #admin-windy-wrapper .leaflet-admin-road-reference-pane-pane { z-index: 450 !important; }

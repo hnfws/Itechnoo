@@ -22,7 +22,7 @@
     </aside>
 
     {{-- Overlay Informasi --}}
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-20 pb-8">
+    <div class="hero-map-caption pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/50 to-transparent pt-20 pb-8">
         <x-container>
             <div class="w-fit max-w-full rounded-lg bg-black/55 px-4 py-3 backdrop-blur-md">
                 <p class="text-xs font-semibold text-white" style="text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);">Selamat Datang!</p>
@@ -87,6 +87,28 @@
     .weather-key-rain { background: #3b82f6; }
     .weather-key-cloudy { background: #94a3b8; }
     .weather-key-clear { background: #facc15; }
+
+    @media (max-width: 639px) {
+        .report-weather-legend {
+            top: 8px !important;
+            right: 8px !important;
+            width: 8rem !important;
+            padding: 0.5rem !important;
+            opacity: 0.92;
+        }
+
+        .report-weather-legend .weather-key-divider { margin: 6px 0; }
+        .report-weather-legend .weather-key-list { gap: 2px; margin-top: 4px; }
+        .report-weather-legend .weather-key-item { gap: 4px; padding: 3px 5px; font-size: 9px; }
+        .report-weather-legend .weather-key-dot {
+            width: 6px;
+            height: 6px;
+            flex-basis: 6px;
+        }
+
+        .hero-map-caption { padding-top: 4rem !important; padding-bottom: 1rem !important; }
+        .hero-map-caption h1 { max-width: 17rem; font-size: 1.125rem; line-height: 1.35; }
+    }
 
     /* CSS Styling Tag Laporan */
     .custom-report-marker {

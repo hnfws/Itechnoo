@@ -1,4 +1,16 @@
 <x-layouts.admin title="Artikel">
+    @push('styles')
+    <style>
+        .articles-desktop-table { display: none; }
+        .articles-mobile-cards { display: block; }
+
+        @media (min-width: 640px) {
+            .articles-desktop-table { display: block; }
+            .articles-mobile-cards { display: none; }
+        }
+    </style>
+    @endpush
+
     @if (session('success'))
         <div class="mb-6 flex items-center gap-2 rounded-card border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
             <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -16,7 +28,7 @@
             </x-button>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="articles-desktop-table overflow-x-auto">
             <table class="w-full min-w-[500px] text-left text-sm">
                 <thead>
                     <tr class="border-y border-line bg-surface-muted text-ink-muted">
@@ -47,6 +59,30 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <div class="articles-mobile-cards divide-y divide-line">
+            @foreach ($articles as $article)
+                <article class="flex items-start gap-3 p-4">
+                    @if ($article->image)
+                        <img src="{{ asset('storage/' . $article->image) }}" alt="" class="size-16 shrink-0 rounded-lg object-cover">
+                    @else
+                        <div class="grid size-16 shrink-0 place-items-center rounded-lg bg-surface-muted text-center text-xs text-ink-muted">Tidak ada</div>
+                    @endif
+
+                    <div class="min-w-0 flex-1 space-y-1">
+                        <h3 class="break-words font-medium text-ink">{{ $article->title }}</h3>
+                        <p class="text-sm text-ink-muted">{{ $article->created_at?->translatedFormat('d F Y') }}</p>
+                        <p class="text-sm font-medium text-green-600">
+                            {{ $article->status === 'published' ? 'Dipublikasi' : 'Draft' }}
+                        </p>
+                    </div>
+
+                    <a href="{{ route('admin.articles.edit', $article) }}" class="shrink-0 rounded-lg border border-line px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-surface-muted hover:text-brand-800">
+                        Edit
+                    </a>
+                </article>
+            @endforeach
         </div>
     </div>
 </x-layouts.admin>
