@@ -1,6 +1,7 @@
 <div align="center">
 
-# iTechnoo
+![Logo](images/logo.png)
+# Katstruction.
 
 ### Platform Pelaporan Infrastruktur Berbasis AI untuk Kolaborasi Warga dan Pemerintah
 
@@ -10,7 +11,7 @@
 
 **Submission for ITECHNO CUP 2026 - Web Development**
 
-**By [Nama Tim]**
+**By WNI Suka Bobo**
 
 </div>
 
@@ -38,10 +39,8 @@ Lengkapi data berikut sesuai anggota tim proyek.
 
 | Nama | Peran | GitHub |
 |------|-------|--------|
-| **[Nama Lengkap 1]** | Project Lead dan Full Stack Developer | [GitHub](https://github.com/[username1]) |
-| **[Nama Lengkap 2]** | Frontend Developer | [GitHub](https://github.com/[username2]) |
-| **[Nama Lengkap 3]** | Backend Developer | [GitHub](https://github.com/[username3]) |
-| **[Nama Lengkap 4]** | UI/UX Designer | [GitHub](https://github.com/[username4]) |
+| **Muhana Fawwas Sausan** | Project Lead dan Full Stack Developer | [GitHub](https://github.com/hnfws) |
+| **Kevin Chandra Syahrial** | Full Stack Developer & UI/UX Designer | [GitHub](https://github.com/04keishi) |
 
 ---
 
@@ -53,7 +52,7 @@ Informasi mengenai kerusakan jalan dan masalah infrastruktur sering kali terseba
 
 ### Solusi yang Ditawarkan
 
-iTechnoo adalah platform pelaporan warga yang menghubungkan masyarakat dengan pengelola laporan melalui satu portal. Warga dapat membuat laporan lengkap dengan foto, lokasi, deskripsi, dan koordinat. Sistem kemudian membantu menganalisis tingkat keparahan serta urgensi laporan menggunakan AI, menghitung skor prioritas berdasarkan kondisi laporan dan dukungan warga, lalu menampilkan status penanganannya secara transparan.
+Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat dengan pengelola laporan melalui satu portal. Warga dapat membuat laporan lengkap dengan foto, lokasi, deskripsi, dan koordinat. Sistem kemudian membantu menganalisis tingkat keparahan serta urgensi laporan menggunakan AI, menghitung skor prioritas berdasarkan kondisi laporan dan dukungan warga, lalu menampilkan status penanganannya secara transparan.
 
 ### Tujuan Proyek
 
