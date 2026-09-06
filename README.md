@@ -89,17 +89,13 @@ Katstruction. adalah platform pelaporan warga yang menghubungkan masyarakat deng
 
 ### Live Demo
 
-Ganti URL berikut setelah aplikasi dideploy:
-
-**[Kunjungi Website](https://[URL_DEMO])**
+**[Kunjungi Website](http://ptrs.site.je/)**
 
 ### Screenshot Aplikasi
 
-Simpan screenshot pada folder `docs/screenshots/`, kemudian ganti nama file berikut sesuai aset yang tersedia.
-
 <div align="center">
 
-<p>Sisi Warga<p>
+<p><strong>Sisi Warga</strong><p>
 
   <img src="docs/screenshots/homepage.png" alt="Homepage Katstruction" width="800"/>
 
@@ -121,7 +117,7 @@ Simpan screenshot pada folder `docs/screenshots/`, kemudian ganti nama file beri
 
   <p><em>Contoh Laporan infrastruktur oleh warga</em></p>
 
-  <p>Sisi Admin<p>
+  <p><strong>Sisi Admin</strong></p>
 
   <img src="docs/screenshots/admin-login.png" alt="Login admin" width="800"/>
 
@@ -135,11 +131,27 @@ Simpan screenshot pada folder `docs/screenshots/`, kemudian ganti nama file beri
 
   <p><em>Dashboard Admin - Monitoring dan pengelolaan laporan</em></p>
 
+  <img src="docs/screenshots/admin-report.png" alt="Laporan admin" width="800"/>
+
+  <p><em>Menu Laporan Admin</em></p>
+
+  <img src="docs/screenshots/admin-report-view.jpeg" alt="View Laporan admin" width="800"/>
+
+  <p><em>View Laporan Admin</em></p>
+
+  <img src="docs/screenshots/admin-artikel.png" alt="Artikel admin" width="800"/>
+
+  <p><em>Menu Artikel Admin</em></p>
+
+  <img src="docs/screenshots/admin-form-artikel.png" alt="Artikel form admin" width="800"/>
+
+  <p><em>Form Artikel Admin</em></p>
+
 </div>
 
 ### Video Demo
 
-Tambahkan tautan video demo setelah tersedia: **[Link Video Demo](https://[URL_VIDEO])**
+Tambahkan tautan video demo setelah tersedia: **[Link Video Demo](https://drive.google.com/drive/folders/1g8Au-V1t8ehk1Sifxjh8Dwfv6JukuLEI?usp=sharing)**
 
 ---
 
@@ -378,7 +390,7 @@ php artisan key:generate
 Contoh konfigurasi SQLite:
 
 ```env
-APP_NAME=iTechnoo
+APP_NAME=Katstruction.
 APP_URL=http://localhost:8000
 
 DB_CONNECTION=sqlite
@@ -491,7 +503,7 @@ Proyek ini menggunakan route web Laravel dan belum menyediakan prefix REST `/api
 
 ```text
 Development: http://localhost:8000
-Production:  https://[domain]
+Production:  http://ptrs.site.je/
 ```
 
 ### Route Publik
@@ -578,6 +590,6 @@ Proyek ini dilisensikan di bawah **MIT License**. Tambahkan file `LICENSE` beris
 
 <div align="center">
 
-**Made with care by [Nama Tim] for ITECHNO CUP 2026**
+**Made with care by WNI Suka Bobo for ITECHNO CUP 2026**
 
 </div>
