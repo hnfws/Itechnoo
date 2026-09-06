@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Services\WeatherService;
 
 class ReportController extends Controller
 {
@@ -32,13 +31,6 @@ public function index()
         ->withCount('upvotes')
         ->latest()
         ->paginate(10);
-
-    // Sisipkan pengecekan cuaca ekstrem untuk tiap laporan
-    $reports->getCollection()->transform(function ($report) {
-        // Ambil nama lokasi dari kolom 'location' (atau ganti sesuai nama kolom lokasi di database kamu)
-        $report->extreme_weather = WeatherService::checkExtremeWeather($report->location);
-        return $report;
-    });
 
     return view('reports', compact('reports'));
 }

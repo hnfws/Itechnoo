@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Report;
 
@@ -27,7 +25,9 @@ class AdminController extends Controller
         ];
 
         // 2. Data Laporan Keseluruhan
-        $reports = Report::latest()->get();
+        $reports = Report::latest()->get([
+            'id', 'title', 'location', 'latitude', 'longitude', 'status',
+        ]);
 
         // 3. Rekap Laporan Bulanan (Tahun Berjalan) untuk Grafik
         $currentYear = date('Y');
@@ -67,60 +67,11 @@ foreach ($monthlyReports as $item) {
     }
 }
 
-        // 4. Ringkasan Otomatis dari AI Gemini
-        $aiSummaryData = Cache::remember('daily_ai_summary', now()->addHours(24), function () {
-            $latestReports = Report::latest()->take(20)->get(['title', 'location', 'status']);
-
-            if ($latestReports->isEmpty()) {
-                return [
-                    'content'    => 'Belum ada data laporan yang cukup untuk dirangkum.',
-                    'updated_at' => now()->format('H:i') . ' WIB'
-                ];
-            }
-
-            $apiKey = config('services.gemini_summary.key') ?? config('services.gemini.key');
-            $model  = config('services.gemini_summary.model', 'gemini-3.6-flash');
-
-            if (!$apiKey) {
-                return [
-                    'content'    => 'API Key Gemini belum diisi di file .env / config.',
-                    'updated_at' => now()->format('H:i') . ' WIB'
-                ];
-            }
-
-            $prompt = "Kamu adalah asisten AI Admin Pemerintah. Rangkumkan laporan warga berikut menjadi 3 poin ringkas dalam bahasa Indonesia untuk tindakan hari ini:\n" . json_encode($latestReports);
-
-            $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'Authorization' => null,
-                    'Content-Type'  => 'application/json',
-                ])
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $prompt]
-                            ]
-                        ]
-                    ]
-                ]);
-
-            if ($response->failed()) {
-                Log::error('Gemini Admin Summary Error: ' . $response->body());
-                $errMsg = $response->json('error.message') ?? 'HTTP ' . $response->status();
-                return [
-                    'content'    => 'Gagal AI Gemini: ' . $errMsg,
-                    'updated_at' => now()->format('H:i') . ' WIB'
-                ];
-            }
-
-            $text = $response->json('candidates.0.content.parts.0.text');
-
-            return [
-                'content'    => $text ?? 'Gagal membaca response dari AI Gemini.',
-                'updated_at' => now()->format('H:i') . ' WIB'
-            ];
-        });
+        // Ringkasan AI dibaca dari cache agar request dashboard tidak menunggu Gemini.
+        $aiSummaryData = Cache::get('daily_ai_summary', [
+            'content' => 'Ringkasan AI belum tersedia. Jalankan pembaruan ringkasan secara berkala.',
+            'updated_at' => now()->format('H:i') . ' WIB',
+        ]);
 
         // 5. Kirim data ke View
         return view('admin.dashboard', [
