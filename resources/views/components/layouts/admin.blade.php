@@ -17,7 +17,7 @@
 
     <title>{{ $title }} — {{ config('app.name') }} Admin</title>
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css">
@@ -36,7 +36,7 @@
     {{-- Sidebar --}}
     <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full border-r border-line bg-surface p-4 transition-transform peer-checked:translate-x-0 lg:translate-x-0">
         <div class="mb-6 flex justify-center pt-2">
-            <span class="grid size-16 place-items-center rounded-full bg-surface-muted text-sm font-semibold text-ink">Logo</span>
+            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="size-16 object-contain">
         </div>
 
         <p class="px-2 text-xs font-medium tracking-wide text-ink-muted uppercase">Menu</p>

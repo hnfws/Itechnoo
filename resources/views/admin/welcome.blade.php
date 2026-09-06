@@ -11,9 +11,7 @@
     <div class="text-center">
         {{-- Logo --}}
         <div class="mb-8 flex justify-center">
-            <span class="grid size-28 place-items-center rounded-full bg-surface-muted text-2xl font-semibold text-ink">
-                Logo
-            </span>
+            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="size-28 object-contain">
         </div>
 
         <h1 class="text-3xl font-bold tracking-tight text-ink">Welcome back, {{ $adminName }}.</h1>

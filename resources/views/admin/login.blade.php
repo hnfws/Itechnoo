@@ -1,7 +1,7 @@
 <x-layouts.guest title="Login Admin">
     {{-- Logo --}}
     <div class="mb-6 flex justify-center">
-        <span class="grid size-16 place-items-center rounded-full bg-brand-600 text-xl font-bold text-white">L</span>
+        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" class="h-64 w-64 max-w-full object-contain">
     </div>
 
     <div class="rounded-2xl bg-surface-muted p-8 shadow-sm">
