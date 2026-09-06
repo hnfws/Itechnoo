@@ -8,17 +8,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+/**
+ * @property int|string|null $month
+ * @property int|string|null $total
+ * @property string|bool|null $extreme_weather
+ */
 class Report extends Model
 {
     use HasFactory;
 
     // Nilai status yang valid beserta labelnya
     const STATUSES = [
-        'belum diverifikasi'     => 'Pending',
-        'terverifikasi'    => 'Terverifikasi',
+        'belum diverifikasi'        => 'Pending',
+        'terverifikasi'             => 'Terverifikasi',
         'terverifikasi_in_progress' => 'Dalam Perbaikan',
-        'resolved'    => 'Selesai',
-        'rejected'    => 'Ditolak',
+        'resolved'                  => 'Selesai',
+        'rejected'                  => 'Ditolak',
     ];
 
     protected $fillable = [
@@ -55,28 +60,28 @@ class Report extends Model
     // Label status dalam Bahasa Indonesia
     public function getStatusLabelAttribute(): string
     {
-        return self::STATUSES[$this->status] ?? $this->status;
+        $status = (string) $this->status;
+
+        if (array_key_exists($status, self::STATUSES)) {
+            return self::STATUSES[$status];
+        }
+
+        return $status;
     }
 
     // Warna teks per status (dipakai di Blade)
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-    'belum diverifikasi'        => 'text-amber-500',
-    'terverifikasi'             => 'text-green-600',
-    'terverifikasi_in_progress' => 'text-brand-600',
-    'resolved'                  => 'text-green-700',
-    'rejected'                  => 'text-danger',
-    default                     => 'text-ink-muted',
-};
-
+            'belum diverifikasi'        => 'text-amber-500',
+            'terverifikasi'             => 'text-green-600',
+            'terverifikasi_in_progress' => 'text-brand-600',
+            'resolved'                  => 'text-green-700',
+            default                     => 'text-danger', // Menangani 'rejected' dan status tak terduga lainnya
+        };
     }
 
     /**
-     * Hitung ulang skor prioritas:
-     * (Bobot Severity AI * 60%) + (Upvote Score * 40%)
-     */
-/**
      * Hitung nilai akhir priority_score (Max 60)
      */
     public function recalculatePriorityScore(): void
@@ -88,12 +93,18 @@ class Report extends Model
             default                      => 10.8,
         };
 
-        // 2. Bobot Upvote (Max 24 Poin)
+        // 2. Bobot Urgency (Max 4.8 Poin)
+        $urgencyScore = match (strtolower(trim($this->urgency ?? 'normal'))) {
+            'mendesak', 'urgent' => 4.8,
+            default             => 0,
+        };
+
+        // 3. Bobot Upvote (Max 24 Poin)
         $upvoteCount = $this->upvotes()->count();
         $upvoteScore = min($upvoteCount * 2.4, 24); 
 
-        // 3. Final Score (Max 60)
-        $this->priority_score = min(round($severityScore + $upvoteScore, 2), 60);
+        // 4. Final Score (Max 60)
+        $this->priority_score = min(round($severityScore + $urgencyScore + $upvoteScore, 2), 60);
         $this->save();
     }
 
@@ -107,11 +118,6 @@ class Report extends Model
         return 'rendah';                                    // Skor < 20
     }
 
-    // Accessor untuk mendapatkan string level prioritas ('tinggi', 'menengah', 'rendah')
-// File: App\Models\Report.php
-
-
-
     /**
      * Accessor untuk mendapatkan nama pelapor yang ter-sensor dinamis berdasarkan huruf depan nama.
      * Dipanggil di Blade dengan: $report->formatted_reporter
@@ -120,7 +126,7 @@ class Report extends Model
     {
         // 1. Jika show_name = true (centang), tampilkan nama asli
         if ($this->show_name) {
-            return $this->reporter;
+            return (string) $this->reporter;
         }
 
         // 2. Jika nama kosong
@@ -129,7 +135,7 @@ class Report extends Model
         }
 
         // 3. Sensor kata per kata berdasarkan huruf depan masing-masing kata
-        $words = explode(' ', trim($this->reporter));
+        $words = explode(' ', trim((string) $this->reporter));
         $maskedWords = array_map(function ($word) {
             if (empty($word)) return '';
             
@@ -142,5 +148,4 @@ class Report extends Model
 
         return implode(' ', $maskedWords);
     }
-
 }

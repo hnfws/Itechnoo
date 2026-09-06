@@ -28,7 +28,10 @@ class ReportController extends Controller
 
 public function index()
 {
-    $reports = Report::withCount('upvotes')->latest()->paginate(10);
+    $reports = Report::where('status', '!=', 'rejected')
+        ->withCount('upvotes')
+        ->latest()
+        ->paginate(10);
 
     // Sisipkan pengecekan cuaca ekstrem untuk tiap laporan
     $reports->getCollection()->transform(function ($report) {
@@ -99,7 +102,9 @@ public function store(Request $request)
      */
     public function show($id)
     {
-        $report = Report::withCount('upvotes')->findOrFail($id);
+        $report = Report::where('status', '!=', 'rejected')
+            ->withCount('upvotes')
+            ->findOrFail($id);
     
     return view('report-detail', compact('report'));
     }

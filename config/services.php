@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'weather' => [
+    'key' => env('WEATHER_API_KEY'),
+],
     'windy' => [
     'key' => env('WINDY_API_KEY'),
 ],
@@ -28,9 +31,10 @@ return [
 ],
 
     'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
-    ],
+    'key'   => env('GEMINI_API_KEY'),
+    'keys'  => env('GEMINI_API_KEYS'),
+    'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+],
 
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
