@@ -17,12 +17,13 @@ class WeatherService
         $cacheKey = 'weather_' . md5(strtolower(trim($locationName)));
 
         return Cache::remember($cacheKey, now()->addMinutes(45), function () use ($locationName) {
-            $apiKey = env('WEATHER_API_KEY');
+            // Gunakan config() sebagai pengganti env()
+            $apiKey = config('services.weather.key');
 
             try {
                 $response = Http::timeout(3)->get("https://api.weatherapi.com/v1/current.json", [
-                    'key' => $apiKey,
-                    'q'   => $locationName,
+                    'key'  => $apiKey,
+                    'q'    => $locationName,
                     'lang' => 'id',
                 ]);
 

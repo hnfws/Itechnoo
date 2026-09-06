@@ -10,9 +10,11 @@ class GeminiService
     public static function analyzeReport(string $imagePath, string $description): ?array
     {
         // 1. Ambil Semua API Key (Multi-Key Support via koma)
-        $rawKeys = env('GEMINI_API_KEYS', env('GEMINI_API_KEY', config('services.gemini.key')));
-        $apiKeys = array_filter(array_map('trim', explode(',', $rawKeys)));
+        $rawKeys = config('services.gemini.keys') 
+            ?? config('services.gemini.key') 
+            ?? '';
 
+        $apiKeys = array_filter(array_map('trim', explode(',', $rawKeys)));
         if (empty($apiKeys)) {
             Log::error('Gemini Error: Tidak ada GEMINI_API_KEY yang ditemukan!');
             return self::fallbackResponse();
@@ -56,7 +58,7 @@ Kembalikan respon HANYA DALAM FORMAT JSON MURNI TANPA MARKDOWN dengan struktur b
 
         // 4. Daftar Model Gemini Melimpah (Mulai dari 3.6 Flash hingga versi Flash stabil)
         $models = [
-            config('services.gemini.model', env('GEMINI_MODEL', 'gemini-3.6-flash')),
+            config('services.gemini.model', 'gemini-3.6-flash'),
             'gemini-3.6-flash',
             'gemini-2.5-flash',
             'gemini-2.0-flash',
