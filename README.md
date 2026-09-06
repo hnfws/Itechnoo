@@ -99,9 +99,19 @@ Simpan screenshot pada folder `docs/screenshots/`, kemudian ganti nama file beri
 
 <div align="center">
 
-  <img src="docs/screenshots/homepage.png" alt="Homepage iTechnoo" width="800"/>
+<p>Sisi Warga<p>
+
+  <img src="docs/screenshots/homepage.png" alt="Homepage Katstruction" width="800"/>
 
   <p><em>Homepage - Ringkasan laporan, peta, dan artikel terbaru</em></p>
+
+  <img src="docs/screenshots/page-artikel.png" alt="Menu artikel" width="800"/>
+
+  <p><em>Menu Artikel</em></p>
+
+  <img src="docs/screenshots/menu-report.png" alt="Menu laporan" width="800"/>
+
+  <p><em>Menu Laporan</em></p>
 
   <img src="docs/screenshots/report-form.png" alt="Form laporan" width="800"/>
 
